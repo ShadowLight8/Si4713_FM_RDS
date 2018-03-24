@@ -1,19 +1,26 @@
+<?php $outputGPIOReset = "";
+if (isset($_POST["GPIOResetButton"]))
+{
+$outputGPIOReset = shell_exec(escapeshellcmd("sudo python ".$pluginDirectory."/".$_GET['plugin']."/GPIOReset.py ".$pluginSettings['GPIONumReset']));
+}
+?>
+
 <div id="Si4713detection" class="settings">
 <fieldset>
 <legend>Si4713 Detection</legend>
 <?php exec("sudo i2cget -y 1 99", $output, $return_val); ?>
-
 <p>
 Detecting Si4713:
 <?php if (implode($output) == "0x80") : ?>
 <span class='good'>Detected on I2C address 0x63</span>
 <?php else: ?>
-<span class='bad'>Not detected on I2C addresses 0x63 or 0x11</span>
+<span class='bad'>Not detected on I2C addresses 0x63</span> <!-- TODO: Check on 0x11 as well -->
 <br />
-The Si4713 must be reset after power on to be detected. Update the GPIO Reset Pin below and try again.
+The Si4713 must be reset after power on to be detected. Use the GPIO Reset below and refresh this page.
 <?php endif; ?>
 </p>
-<p>GPIO Reset Pin #: <?php PrintSettingText("GPIOResetPin", 1, 0, 2, 2, "Si4713_FM_RDS", "4"); ?><?php PrintSettingSave("GPIOResetPin", "GPIOResetPin", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>GPIO# for Reset: <?php PrintSettingText("GPIONumReset", 0, 0, 2, 2, "Si4713_FM_RDS", "4"); ?><?php PrintSettingSave("GPIONumReset", "GPIONumReset", 0, 0, "Si4713_FM_RDS"); ?></p>
+<form method="post"><p><button name="GPIOResetButton">Execute GPIO Reset</button> <?php echo $outputGPIOReset; ?></p></form>
 </fieldset>
 </div>
 
