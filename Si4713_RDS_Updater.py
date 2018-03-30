@@ -39,11 +39,11 @@ except OSError as oe:
 	if oe.errno != errno.EEXIST:
 		raise
 
-with open(fifo_path, 'r') as fifo:
+with open(fifo_path, 'r', 0) as fifo:
 	while True:
-		line = fifo.read()
+		line = fifo.readline()
 		if len(line) > 0:
-			logging.debug(line)
+			logging.debug(line.rstrip())
 			if line == "EXIT":
 				exit()
 		else:
