@@ -50,11 +50,10 @@ if len(argv) > 1:
 
 		make_fifo()
 		with open(fifo_path, 'w') as fifo:
-			fifo.write("INIT")
+			fifo.write("INIT" + '\n')
 
 		print "media,playlist"
 		logging.info("Processing --list done")
-		exit()
 
 	elif argv[1] == "--exit":
 		# Not used by FPPD, but useful for testing
@@ -70,10 +69,9 @@ if len(argv) > 1:
 			logging.debug("Lock found - " + updater_path + " is running")
 			make_fifo()
 			with open(fifo_path, 'w') as fifo:
-				fifo.write("EXIT")
+				fifo.write("EXIT" + '\n')
 
 		logging.info("Processing --exit done")
-		exit()
 
 	elif argv[2] == "media":
 		# TODO: When not type:pause or event?
@@ -97,11 +95,11 @@ if len(argv) > 1:
 		make_fifo()
 		with open(fifo_path, 'w') as fifo:
 			if media_type == 'pause': # Other things to send blanks for?
-				fifo.write('\n'); # Empty Title
-				fifo.write('\n'); # Empty Artist
+				fifo.write('T\n'); # Empty Title
+				fifo.write('A\n'); # Empty Artist
 			else:
-				fifo.write(media_title + '\n');
-				fifo.write(media_artist + '\n');
+				fifo.write('T' + media_title + '\n');
+				fifo.write('A' + media_artist + '\n');
 		logging.info('Processing media done')		
 
 	elif argv[2] == 'playlist':
@@ -116,10 +114,11 @@ if len(argv) > 1:
 		make_fifo()
 		with open(fifo_path, 'w') as fifo:
 			if playlist_action == 'start':
-				fifo.write('START')
+				fifo.write('START' + '\n')
 			else:
-				fifo.write('\n'); # Empty Title
-                                fifo.write('\n'); # Empty Artist
+				fifo.write('T\n'); # Empty Title
+                                fifo.write('A\n'); # Empty Artist
+				# TODO: Send STOP is playlist is done?
 		logging.info('Processing playlist done')
 
 else:
@@ -127,5 +126,5 @@ else:
 	print 'Usage: '
 	print '   --list     | Used by fppd at startup. Used to start up the Si4713_RDS_Updater.py script'
 	print '   --exit     | Test function used to shutdown the Si4713_RDS_Updater.py script'
-	print '   --media    | Used by fppd when a new items starts in a playlist'
-	print '   --playlist | Used by fppd when a playlist starts or stops'
+	print '   --type media --data \'{...}\'    | Used by fppd when a new items starts in a playlist'
+	print '   --type playlist --data \'{...}\' | Used by fppd when a playlist starts or stops'
