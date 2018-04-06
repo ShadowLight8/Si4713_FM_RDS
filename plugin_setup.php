@@ -46,6 +46,18 @@ The Si4713 must be reset after power on to be detected. Set the GPIO# for Reset,
 
 <br />
 
+<div id="Si4713Pluginsettings" class="settings">
+<fieldset>
+<legend>Si4713 Plugin Settings</legend>
+<p>Start Si4713 at: <?php PrintSettingSelect("Start", "Start", 0, 0, "FPPDStart", Array("FPPD Start (default)"=>"FPPDStart", "Playlist Start"=>"PlaylistStart", "Never"=>"Never"), "Si4713_FM_RDS", ""); ?><br />
+At Start, the Si4713 is reset, FM settings initialized, will broadcast any audio played, and send messages RDS (if enabled).</p>
+<p>Stop Si4713 at: <?php PrintSettingSelect("Stop", "Stop", 0, 0, "Never", Array("Playlist Stop"=>"PlaylistStop", "Never (default)"=>"Never"), "Si4713_FM_RDS", ""); ?><br />
+At Stop, the Si4713 is reset. Listeners will hear static.</p>
+</fieldset>
+</div>
+
+<br />
+
 <div id="Si4713FMsettings" class="settings">
 <fieldset>
 <legend>Si4713 FM Settings</legend>
@@ -64,6 +76,18 @@ The Si4713 must be reset after power on to be detected. Set the GPIO# for Reset,
 <div id="Si4713RDSsettings" class="settings">
 <fieldset>
 <legend>Si4713 RDS Settings</legend>
+<p>Enable RDS</p>
+<p>Difference between RDS Station and RDS Text</p>
+<p>RDS Station (8 char at a time)</p>
+<p>... Refresh Rate</p>
+<p>... include Title</p>
+<p>... include Artist</p>
+<p>... include Track + "of XX"</p>
+<p>RDS Text</p>
+<p>... Refresh Rate</p> 
+<p>... include Title</p>
+<p>... include Artist</p>
+<p>... include Track + "of XX"</p>
 </fieldset>
 </div>
 

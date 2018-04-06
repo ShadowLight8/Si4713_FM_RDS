@@ -11,26 +11,34 @@ import socket
 
 def make_fifo():
 	try:
-		logging.debug("Setting up write side of fifo " + fifo_path)
+		logging.debug('Setting up write side of fifo %s', fifo_path)
 		os.mkfifo(fifo_path)
 	except OSError as oe:
-		logging.debug("Already exists")
+		logging.debug('Already exists')
 		if oe.errno != errno.EEXIST:
 			raise
 
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=script_dir+'/Si4713_FM_RDS.log',level=logging.INFO)
-logging.info("----------")
-logging.debug("Arguments %s", argv[1:])
+logging.basicConfig(filename=script_dir + '/Si4713_FM_RDS.log',level=logging.DEBUG)
+logging.info('----------')
+logging.debug('Arguments %s', argv[1:])
+logging.debug('Environ %s', os.environ)
 
-fifo_path = script_dir + "/Si4713_FM_RDS_FIFO"
-updater_path = script_dir + "/Si4713_RDS_Updater.py"
+fifo_path = script_dir + '/Si4713_FM_RDS_FIFO'
+updater_path = script_dir + '/Si4713_RDS_Updater.py'
 
 # Config from os.path.abspath(argv[0])
 # ../../config/plugin.Si4713_FM_RDS
 # TODO: Not sure this is the right way to locate the config file, but it works
 
+configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
+config = {}
+with open(configfile, 'r') as f:
+	for line in f:
+		(key, val) = line.split(' = ')
+		config[key] = val.replace('"', '').strip()
+logging.debug(config)
 # TODO: If RDS is not enabled, exit?
 
 if len(argv) > 1:
