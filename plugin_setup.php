@@ -28,9 +28,9 @@ $outputGPIOReset = shell_exec(escapeshellcmd("sudo python ".$pluginDirectory."/"
 </a>
 </div>
 
-<?php exec("sudo i2cget -y 1 99", $output, $return_val); ?>
+<?php exec("sudo i2cget -y 1 0x63", $output, $return_val); ?>
 <p>Detecting Si4713:
-<?php if (implode($output) == "0x80") : ?>
+<?php if (implode($output) != "Error: Read failed") : ?>
 <span class='good'>Detected on I<sup>2</sup>C address 0x63</span>
 <?php else: ?>
 <span class='bad'>Not detected on I<sup>2</sup>C addresses 0x63</span> <!-- TODO: Check on 0x11 as well -->

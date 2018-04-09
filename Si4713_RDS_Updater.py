@@ -13,7 +13,7 @@ import socket
 
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=os.path.dirname(os.path.abspath(argv[0]))+'/Si4713_RDS_Updater.log',level=logging.INFO,format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename=os.path.dirname(os.path.abspath(argv[0]))+'/Si4713_RDS_Updater.log',level=logging.DEBUG,format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info("----------")
 
 fifo_path = script_dir + "/Si4713_FM_RDS_FIFO"
@@ -54,6 +54,8 @@ try:
 except OSError as oe:
 	if oe.errno != errno.EEXIST:
 		raise
+	else:
+		logging.debug('Fifo already exists')
 
 with open(fifo_path, 'r', 0) as fifo:
 	radio = Adafruit_Si4713()
@@ -67,6 +69,9 @@ with open(fifo_path, 'r', 0) as fifo:
 			if line == 'EXIT':
 				logging.info('exit')
 				exit()
+			elif line == 'RESET':
+				# TODO: Reset GPIO from plugin_setup.php
+				
 			elif line == 'INIT':
 				logging.info('init')
 				# TODO: Reset Si4713, configure FM, configure blank RDS
