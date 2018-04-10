@@ -1,7 +1,7 @@
 <?php $outputGPIOReset = "";
 if (isset($_POST["GPIOResetButton"]))
 {
-$outputGPIOReset = shell_exec(escapeshellcmd("sudo python ".$pluginDirectory."/".$_GET['plugin']."/GPIOReset.py ".$pluginSettings['GPIONumReset']));
+$outputGPIOReset = shell_exec(escapeshellcmd("sudo ".$pluginDirectory."/".$_GET['plugin']."/callbacks.py --reset"));
 }
 ?>
 

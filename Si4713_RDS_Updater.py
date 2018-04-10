@@ -1,20 +1,32 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python
 
-from sys import argv
-from time import sleep
-from datetime import datetime
-from Adafruit_Si4713 import Adafruit_Si4713
 import logging
 import json
 import os
 import errno
 import atexit
 import socket
+from sys import argv
+from time import sleep
+from datetime import datetime
+from Adafruit_Si4713 import Adafruit_Si4713
+
+logging.basicConfig(filename=os.path.dirname(os.path.abspath(argv[0]))+'/Si4713_Updater.log',level=logging.DEBUG,format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.info("----------")
+
+def read_config():
+	configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
+	config = {}
+	with open(configfile, 'r') as f:
+        	for line in f:
+                	(key, val) = line.split(' = ')
+	                config[key] = val.replace('"', '').strip()
+	logging.debug('Config %s', config)
+	return config
+
+config = read_config()
 
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
-
-logging.basicConfig(filename=os.path.dirname(os.path.abspath(argv[0]))+'/Si4713_RDS_Updater.log',level=logging.DEBUG,format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-logging.info("----------")
 
 fifo_path = script_dir + "/Si4713_FM_RDS_FIFO"
 
@@ -22,10 +34,15 @@ inited = False
 stationdata = ' Happy  Hallo-     -ween'
 stationfragments = (len(stationdata)-1)//8+1
 stationdelay = 4
+
+showartist = True
+
 title = ''
 artist = ''
+track = ''
+bufferdata = ''
+bufferfragments = 3
 bufferdelay = 6
-showartist = True
 
 # Establish lock via socket or exit if failed
 try:
@@ -58,7 +75,7 @@ except OSError as oe:
 		logging.debug('Fifo already exists')
 
 with open(fifo_path, 'r', 0) as fifo:
-	radio = Adafruit_Si4713()
+	radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
 	stationtick = 0
 	stationfrag = 0
 	buffertick = 0
@@ -70,8 +87,12 @@ with open(fifo_path, 'r', 0) as fifo:
 				logging.info('exit')
 				exit()
 			elif line == 'RESET':
-				# TODO: Reset GPIO from plugin_setup.php
-				
+				config = read_config()
+				radio = None
+				radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
+				radio.reset()
+				inited = False
+				print ('GPIO Number %s reset', config['GPIONumReset'])
 			elif line == 'INIT':
 				logging.info('init')
 				# TODO: Reset Si4713, configure FM, configure blank RDS
