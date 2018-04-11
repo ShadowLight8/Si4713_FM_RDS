@@ -11,7 +11,9 @@ from time import sleep
 from datetime import datetime
 from Adafruit_Si4713 import Adafruit_Si4713
 
-logging.basicConfig(filename=os.path.dirname(os.path.abspath(argv[0]))+'/Si4713_Updater.log',level=logging.DEBUG,format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+script_dir = os.path.dirname(os.path.abspath(argv[0]))
+
+logging.basicConfig(filename=script_dir + '/Si4713_Updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info("----------")
 
 def read_config():
@@ -26,15 +28,12 @@ def read_config():
 
 config = read_config()
 
-script_dir = os.path.dirname(os.path.abspath(argv[0]))
-
-fifo_path = script_dir + "/Si4713_FM_RDS_FIFO"
-
 inited = False
 stationdata = ' Happy  Hallo-     -ween'
 stationfragments = (len(stationdata)-1)//8+1
 stationdelay = 4
-
+stationtick = 0
+stationcurfrag = 0
 showartist = True
 
 title = ''
@@ -43,6 +42,8 @@ track = ''
 bufferdata = ''
 bufferfragments = 3
 bufferdelay = 6
+buffertick = 0
+buffercurfrag = 0
 
 # Establish lock via socket or exit if failed
 try:
@@ -51,7 +52,7 @@ try:
 	logging.debug('Lock created')
 except:
 	logging.error('Unable to create lock. Another instance of Si4713_RDS_Updater.py running?')
-	exit(-1)
+	exit(1)
 
 # Config from os.path.abspath(argv[0])
 # ../../config/plugin.Si4713_FM_RDS
@@ -65,8 +66,9 @@ def cleanup():
 	except:
 		pass
 
+fifo_path = script_dir + "/Si4713_FM_RDS_FIFO"
 try:
-	logging.debug("Setting up read side of fifo " + fifo_path)
+	logging.debug('Setting up read side of fifo %s', fifo_path)
 	os.mkfifo(fifo_path)
 except OSError as oe:
 	if oe.errno != errno.EEXIST:
@@ -74,18 +76,30 @@ except OSError as oe:
 	else:
 		logging.debug('Fifo already exists')
 
+radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
+
+def Si4713_start:
+	logging.info('Si4713 Start')
+	if not radio.begin():
+		logging.error('Unable to initialize radio. Check that the Si4713 is connected, then restart FPPD.')
+		exit(1)
+	radio.setTXpower(int(config['Power']))
+	radio.tuneFM(int(config['Frequency'].replace('.',''))
+	# TODO: If RDS enabled
+	radio.beginRDS()
+	radio.setRDSstation(stationdata[0:8])
+	inited = True
+	logging.info('Radio initialized')
+
 with open(fifo_path, 'r', 0) as fifo:
-	radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
-	stationtick = 0
-	stationfrag = 0
-	buffertick = 0
 	while True:
 		line = fifo.readline().rstrip()
 		if len(line) > 0:
-			logging.debug('line - ' + line)
+			logging.debug('line - %s', line)
 			if line == 'EXIT':
 				logging.info('exit')
 				exit()
+
 			elif line == 'RESET':
 				config = read_config()
 				radio = None
@@ -93,21 +107,25 @@ with open(fifo_path, 'r', 0) as fifo:
 				radio.reset()
 				inited = False
 				print ('GPIO Number %s reset', config['GPIONumReset'])
+
 			elif line == 'INIT':
 				logging.info('init')
-				# TODO: Reset Si4713, configure FM, configure blank RDS
-				if not radio.begin():
-					logging.error('Unable to initialize radio. Check that the Si4713 is connected, then restart FPPD.')
-					exit(-1)
-				radio.setTXpower(100)
-				radio.tuneFM(10010)
-				radio.beginRDS()
-				radio.setRDSstation(stationdata[0:8])
-				inited = True
-				logging.info('Radio initialized')
+				if config['Start'] == "FPPDStart":
+					Si4713_start()
+
 			elif line == 'START':
 				logging.info('start')
-				# TODO: ?
+				if config['Start'] == "Playlist":
+					Si4713_start()
+
+			elif line == 'STOP':
+				logging.info('stop')
+				if config['Stop'] == "Playlist":
+					radio.reset()
+					radio = None
+					inited = False
+					logging.info('Radio stopped')
+
 			elif line[0] == 'T':
 				logging.debug('T')
 				title = line[1:33]
@@ -115,9 +133,11 @@ with open(fifo_path, 'r', 0) as fifo:
 				logging.info('Reset buffer to title [' + title + ']')
 				radio.setRDSbuffer(title)
 				buffertick = 0
+
 			elif line[0] == 'A':
 				logging.debug('A')
 				artist = line[1:33]
+
 			else:
 				# TODO: ?
 				logging.info('else')
