@@ -11,9 +11,41 @@ from time import sleep
 from datetime import datetime
 from Adafruit_Si4713 import Adafruit_Si4713
 
+class RDSBuffer(object):
+	data = ''
+	fragments = 0
+	frag = 0
+	delay = 0
+	tick = 0
+
+	def __init__(self, data='', fragsize=8, delay=5):
+		self.data = data
+		self.fragsize = fragsize
+		self.fragments = (len(self.data)-1)//self.fragsize+1 #Private function on data changes?
+		self.frag = 0
+		self.delay = delay
+		self.tick = 0
+
+	def updateData(self, data):
+		self.data = data
+		updateFragments() # TODO: Check syntax
+		self.frag = 0
+		self.tick = 0
+
+	def updateFragments(self): # TODO: Make private?
+		self.fragments = (len(self.data)-1)//self.fragsize+1
+
+	def nextTick():
+		# Inc tick, return True if delay reached
+
+	def nextFrag():
+		# Inc frag, return Next fragment
+
+
+
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=script_dir + '/Si4713_Updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info("----------")
 
 def read_config():
@@ -28,22 +60,31 @@ def read_config():
 
 config = read_config()
 
-inited = False
-stationdata = ' Happy  Hallo-     -ween'
-stationfragments = (len(stationdata)-1)//8+1
-stationdelay = 4
-stationtick = 0
-stationcurfrag = 0
-showartist = True
+radio_ready = False
 
+# *_data: Complete string of all data to be sent
+# *_fragments: How many block of 8 or 32 characters the *_data is
+# *_frag: Current fragment being sent by radio
+# *_delay: Time, in seconds, between frag updates
+# *_tick: Counter to track time until next delay interval reached
+
+#Make station and buffer a common class
+
+station_data = ' Happy  Hallo-     -ween'
+station_fragments = (len(stationdata)-1)//8+1
+station_frag = 0
+station_delay = 4
+station_tick = 0
+
+showartist = True # Should be removed
 title = ''
 artist = ''
 track = ''
-bufferdata = ''
-bufferfragments = 3
-bufferdelay = 6
-buffertick = 0
-buffercurfrag = 0
+buffer_data = ''
+buffer_fragments = 3
+buffer_frag = 0
+buffer_delay = 6
+buffer_tick = 0
 
 # Establish lock via socket or exit if failed
 try:
@@ -78,17 +119,17 @@ except OSError as oe:
 
 radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
 
-def Si4713_start:
+def Si4713_start():
 	logging.info('Si4713 Start')
 	if not radio.begin():
 		logging.error('Unable to initialize radio. Check that the Si4713 is connected, then restart FPPD.')
 		exit(1)
 	radio.setTXpower(int(config['Power']))
-	radio.tuneFM(int(config['Frequency'].replace('.',''))
+	radio.tuneFM(int(config['Frequency'].replace('.','')))
 	# TODO: If RDS enabled
 	radio.beginRDS()
 	radio.setRDSstation(stationdata[0:8])
-	inited = True
+	radio_ready = True
 	logging.info('Radio initialized')
 
 with open(fifo_path, 'r', 0) as fifo:
@@ -105,7 +146,7 @@ with open(fifo_path, 'r', 0) as fifo:
 				radio = None
 				radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
 				radio.reset()
-				inited = False
+				radio_ready = False
 				print ('GPIO Number %s reset', config['GPIONumReset'])
 
 			elif line == 'INIT':
@@ -123,7 +164,7 @@ with open(fifo_path, 'r', 0) as fifo:
 				if config['Stop'] == "Playlist":
 					radio.reset()
 					radio = None
-					inited = False
+					radio_ready = False
 					logging.info('Radio stopped')
 
 			elif line[0] == 'T':
@@ -144,13 +185,13 @@ with open(fifo_path, 'r', 0) as fifo:
 
 		else:
 			stationtick = (stationtick + 1) % stationdelay
-			if inited and stationtick == 0:
+			if radio_ready and stationtick == 0:
 				logging.info('Set station to fragment ' + str(stationfrag) + ' [' + stationdata[8*stationfrag:8*(stationfrag+1)] + ']')
 				radio.setRDSstation(stationdata[8*stationfrag:8*(stationfrag+1)])
 				stationfrag = (stationfrag + 1) % stationfragments
 
 			buffertick = (buffertick + 1) % bufferdelay
-			if inited and buffertick == 0:
+			if radio_ready and buffertick == 0:
 				if showartist:
 					logging.info('Set buffer to artist [' + artist + ']')
 					radio.setRDSbuffer(artist)

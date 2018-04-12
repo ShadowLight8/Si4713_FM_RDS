@@ -19,16 +19,6 @@ if len(argv) <= 1:
 	print 'Note: Running with sudo might be needed for manual execution'
 	exit()
 
-def make_fifo():
-	try:
-		logging.debug('Setting up write side of fifo %s', fifo_path)
-		os.mkfifo(fifo_path)
-	except OSError as oe:
-		if oe.errno != errno.EEXIST:
-			raise
-		else:
-			logging.debug('Fifo already exists')
-
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
 logging.basicConfig(filename=script_dir + '/Si4713_callbacks.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
@@ -52,7 +42,14 @@ except socket.error:
 
 # Always setup FIFO
 fifo_path = script_dir + '/Si4713_FM_RDS_FIFO'
-make_fifo()
+try:
+	logging.debug('Setting up write side of fifo %s', fifo_path)
+	os.mkfifo(fifo_path)
+except OSError as oe:
+	if oe.errno != errno.EEXIST:
+		raise
+	else:
+		logging.debug('Fifo already exists')
 
 with open(fifo_path, 'w') as fifo:
 	logging.info('Processing %s', argv[1])
