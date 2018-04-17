@@ -73,7 +73,7 @@ with open(fifo_path, 'w') as fifo:
 		j = json.loads(argv[4])
 
 		media_type = j['type'] if 'type' in j else 'pause'
-		media_title = j['title'] if 'title' in j else 'No Title'
+		media_title = j['title'] if 'title' in j else '-'
 		media_artist = j['artist'] if 'artist' in j else ''
 		# TODO: Enhancement - Send play time to updater to allow a more graceful ends to the RDS for a song
 

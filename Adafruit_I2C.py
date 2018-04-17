@@ -1,7 +1,4 @@
 #!/usr/bin/python
-# Code from https://github.com/daniel-j/Adafruit-Si4713-RPi
-# Based on https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/legacy/Adafruit_I2C/Adafruit_I2C.py
-
 import re
 import smbus
 

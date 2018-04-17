@@ -38,7 +38,7 @@ $outputGPIOReset = shell_exec(escapeshellcmd("sudo ".$pluginDirectory."/".$_GET[
 The Si4713 must be reset after power on to be detected. Set the GPIO# for Reset, save, then Use the GPIO Reset.
 <?php endif; ?>
 </p>
-<p>GPIO# (not pin number) for Reset: <?php PrintSettingText("GPIONumReset", 0, 0, 2, 2, "Si4713_FM_RDS", "4"); ?><?php PrintSettingSave("GPIONumReset", "GPIONumReset", 0, 0, "Si4713_FM_RDS"); ?></p>
+<p>GPIO# (not pin number) for Reset: <?php PrintSettingText("GPIONumReset", 1, 0, 2, 2, "Si4713_FM_RDS", "4"); ?><?php PrintSettingSave("GPIONumReset", "GPIONumReset", 1, 0, "Si4713_FM_RDS"); ?></p>
 <form method="post"><p><button name="GPIOResetButton">Execute GPIO Reset</button> <?php echo $outputGPIOReset; ?></p></form>
 
 </fieldset>
@@ -49,9 +49,9 @@ The Si4713 must be reset after power on to be detected. Set the GPIO# for Reset,
 <div id="Si4713Pluginsettings" class="settings">
 <fieldset>
 <legend>Si4713 Plugin Settings</legend>
-<p>Start Si4713 at: <?php PrintSettingSelect("Start", "Start", 0, 0, "FPPDStart", Array("FPPD Start (default)"=>"FPPDStart", "Playlist Start"=>"PlaylistStart", "Never"=>"Never"), "Si4713_FM_RDS", ""); ?><br />
+<p>Start Si4713 at: <?php PrintSettingSelect("Start", "Start", 1, 0, "FPPDStart", Array("FPPD Start (default)"=>"FPPDStart", "Playlist Start"=>"PlaylistStart", "Never"=>"Never"), "Si4713_FM_RDS", ""); ?><br />
 At Start, the Si4713 is reset, FM settings initialized, will broadcast any audio played, and send messages RDS (if enabled).</p>
-<p>Stop Si4713 at: <?php PrintSettingSelect("Stop", "Stop", 0, 0, "Never", Array("Playlist Stop"=>"PlaylistStop", "Never (default)"=>"Never"), "Si4713_FM_RDS", ""); ?><br />
+<p>Stop Si4713 at: <?php PrintSettingSelect("Stop", "Stop", 1, 0, "Never", Array("Playlist Stop"=>"PlaylistStop", "Never (default)"=>"Never"), "Si4713_FM_RDS", ""); ?><br />
 At Stop, the Si4713 is reset. Listeners will hear static.</p>
 </fieldset>
 </div>
@@ -62,11 +62,11 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <fieldset>
 <legend>Si4713 FM Settings</legend>
 
-<p>Frequency (76.00-108.00): <?php PrintSettingText("Frequency", 0, 0, 6, 6, "Si4713_FM_RDS", "100.10"); ?>MHz <?php PrintSettingSave("Frequency", "Frequency", 0, 0, "Si4713_FM_RDS"); ?></p>
-<p>Power (88-115, 116-120<sup>*</sup>): <?php PrintSettingText("Power", 0, 0, 3, 3, "Si4713_FM_RDS", "90"); ?>dB&mu;V <?php PrintSettingSave("Power", "Power", 0, 0, "Si4713_FM_RDS"); ?>
+<p>Frequency (76.00-108.00): <?php PrintSettingText("Frequency", 1, 0, 6, 6, "Si4713_FM_RDS", "100.10"); ?>MHz <?php PrintSettingSave("Frequency", "Frequency", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Power (88-115, 116-120<sup>*</sup>): <?php PrintSettingText("Power", 1, 0, 3, 3, "Si4713_FM_RDS", "90"); ?>dB&mu;V <?php PrintSettingSave("Power", "Power", 1, 0, "Si4713_FM_RDS"); ?>
 <br /><sup>*</sup>Can be set as high as 120dB&mu;V, but voltage accuracy above 115dB&mu;V is not guaranteed.</p>
-<p>Preemphasis: <?php PrintSettingSelect("Preemphasis", "Preemphasis", 0, 0, "75us", Array("50&mu;s (Europe, Australia, Japan)"=>"50us", "75&mu;s (USA, default)"=>"75us"), "Si4713_FM_RDS", ""); ?></p>
-<p>Antenna Tuning Capacitor (0=Auto, 1-191): <?php PrintSettingText("AntCap", 0, 0, 3, 3, "Si4713_FM_RDS", "0"); ?> * 0.25pF <?php PrintSettingSave("AntCap", "AntCap", 0, 0, "Si4713_FM_RDS"); ?></p>
+<p>Preemphasis: <?php PrintSettingSelect("Preemphasis", "Preemphasis", 1, 0, "75us", Array("50&mu;s (Europe, Australia, Japan)"=>"50us", "75&mu;s (USA, default)"=>"75us"), "Si4713_FM_RDS", ""); ?></p>
+<p>Antenna Tuning Capacitor (0=Auto, 1-191): <?php PrintSettingText("AntCap", 1, 0, 3, 3, "Si4713_FM_RDS", "0"); ?> * 0.25pF <?php PrintSettingSave("AntCap", "AntCap", 1, 0, "Si4713_FM_RDS"); ?></p>
 </fieldset>
 </div>
 
@@ -76,11 +76,11 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <fieldset>
 <legend>Si4713 RDS Settings</legend>
 <p>Enable RDS: <?php PrintSettingCheckbox("EnableRDS", "EnableRDS", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
-<p>Difference between RDS Station and RDS Text</p>
+<!-- p>Difference between RDS Station and RDS Text</p -->
 <p>RDS Station - Sent 8 characters at a time</p>
 <p>Delay between blocks (>3): <?php PrintSettingText("StationDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "4"); ?>seconds <?php PrintSettingSave("StationDelay", "StationDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
 <p>Static Text (can be blank): <?php PrintSettingText("StationText", 1, 0, 64, 32, "Si4713_FM_RDS", " Happy  Hallo-     -ween"); ?><?php PrintSettingSave("StationText", "StationText", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p>Include Title: <?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+<p style="display: none">Include Title: <?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
  --- Include Artist: <?php PrintSettingCheckbox("StationArtist", "StationArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
  --- Include Track Number: <?php PrintSettingCheckbox("StationTrackNum", "StationTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
 
@@ -88,28 +88,29 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 
 <p>RDS Text - Sent 32 characters at a time</p>
 <p>Delay between blocks (>3): <?php PrintSettingText("RDSTextDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "7"); ?>seconds <?php PrintSettingSave("RDSTestDelay", "RDSTextDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p>Static Text (can be blank): <?php PrintSettingText("RDSTextText", 1, 0, 64, 32, "Si4713_FM_RDS", ""); ?><?php PrintSettingSave("RDSTextText", "StationText", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Static Text (can be blank): <?php PrintSettingText("RDSTextText", 1, 0, 64, 32, "Si4713_FM_RDS", ""); ?><?php PrintSettingSave("RDSTextText", "RDSTextText", 1, 0, "Si4713_FM_RDS"); ?></p>
 <p>Include Title: <?php PrintSettingCheckbox("RDSTextTitle", "RDSTextTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
- --- Include Artist: <?php PrintSettingCheckbox("RDSTextArtist", "RDSTextArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
- --- Include Track Number: <?php PrintSettingCheckbox("RDSTextTrackNum", "RDSTextTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+ --- Include Artist: <?php PrintSettingCheckbox("RDSTextArtist", "RDSTextArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p style="display: none"> --- Include Track Number: <?php PrintSettingCheckbox("RDSTextTrackNum", "RDSTextTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
 </fieldset>
 </div>
 
 <br />
 
-<div id="Si4713Debug" class="settings">
+<div id="Si4713Debug" class="settings" style="display: none">
 <fieldset>
 <legend>Si4713 Debugging</legend>
-<p>Link to logs</p>
-<p>Info about radio settings</p>
+<p>TODO: Link to logs</p>
+<input onclick= "ViewFile('Logs', ScriptNameSelected);" id="btnViewScript" class="disableButtons" type="button"  value="View" />
+<p>TODO: Info about radio settings</p>
 </fieldset>
 </div>
 
-<br />
+<!-- br /-->
 
 <div id="Si4713Info" class="settings">
 <fieldset>
-<legend>Si4713 Information</legend>
+<legend>Additional Si4713 Information</legend>
 <p><a href="https://www.adafruit.com/product/1958">Adafruit Si4713 Breakout Board</a></p>
 <p><a href="https://www.silabs.com/documents/public/data-sheets/Si4712-13-B30.pdf">Si4713 Datasheet</a></p>
 <p><a href="https://www.silabs.com/documents/public/application-notes/AN332.pdf">Si4713 Programming Guide</a></p>

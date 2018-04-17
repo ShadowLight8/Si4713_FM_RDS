@@ -6,6 +6,9 @@
 # See the example at the end of this file for help!
 
 # Additional v1.1 changes by ShadowLight8 / Nick Anderson
+#  Timing changes to get more consistent behavior from the Si4713
+#  Added Preemphasis variable to allow control from outside of the class
+#  Fixed a bug in setRDSBuffer
 
 from time import sleep
 import RPi.GPIO as GPIO

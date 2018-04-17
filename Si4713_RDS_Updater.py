@@ -19,7 +19,7 @@ class RadioBuffer(object):
 # frag: Current fragment to be sent by radio
 # tick: Counter to track time until next delay interval reached
 
-	def __init__(self, data='', fragsize=8, delay=5):
+	def __init__(self, data='', fragsize=8, delay=4):
 		self.fragsize = fragsize
 		self.delay = delay
 		self.updateData(data)
@@ -40,12 +40,16 @@ class RadioBuffer(object):
 			return True
 		return False
 
-script_dir = os.path.dirname(os.path.abspath(argv[0]))
-
-logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-logging.info("----------")
+@atexit.register
+def cleanup():
+	try:
+		logging.debug('Cleaning up fifo')
+		os.unlink(fifo_path)
+	except:
+		pass
 
 def read_config():
+	global config
 	configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
 	config = {}
 	with open(configfile, 'r') as f:
@@ -53,18 +57,70 @@ def read_config():
                 	(key, val) = line.split(' = ')
 	                config[key] = val.replace('"', '').strip()
 	logging.debug('Config %s', config)
-	return config
 
-config = read_config()
+def init_actions():
+	read_config()
+	RDSStation.delay = int(config['StationDelay'])
+	RDSStation.updateData(config['StationText'])
+	RDSText.delay = int(config['RDSTextDelay'])
+	RDSText.updateData(config['RDSTextText'])
 
+def Si4713_start():
+	global radio
+	global radio_ready
+	logging.info('Si4713 Start')
+	radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
+
+	if config['Preemphasis'] == '50us':
+		radio.preemphasis = 1
+
+	if not radio.begin():
+		logging.error('Unable to initialize radio. Check that the Si4713 is connected, then restart FPPD.')
+		exit(1)
+
+	radio.setTXpower(int(config['Power']), int(config['AntCap']))
+	radio.tuneFM(int(config['Frequency'].replace('.','')))
+	# TODO: If RDS enabled
+	if config['EnableRDS'] == 'True':
+		radio.beginRDS()
+		radio.setRDSstation(RDSStation.currentFragment())
+	radio_ready = True
+	logging.info('Radio initialized')
+	Si4713_status()
+	
+def Si4713_status():
+	logging.info('Radio status')
+	radio.readTuneStatus()
+	logging.info('Power: %s dBuV - ANTcap: %s - Noise level: %s - Frequency: %s', radio.currdBuV, radio.currAntCap, radio.currNoiseLevel, radio.currFreq)
+	radio.readASQ()
+	logging.info('ASQ: %s - InLevel: %s dBfs', hex(radio.currASQ), radio.currInLevel)
+
+def updateRDSData():
+	logging.info('Updating RDS Data')
+	# TODO: Deal with different RDS options
+	# TODO: RDSStation.updateData...
+	RDSText.updateData(title + artist)
+
+# Common variables
 radio_ready = False
 
-RDSStation = RadioBuffer(config['StationText'], 8, int(config['StationDelay']))
-RDSText = RadioBuffer(config['RDSTextText'], 32, int(config['RDSTextDelay']))
+RDSStation = RadioBuffer('', 8, 4)
+RDSText = RadioBuffer('', 32, 7)
 
 title = ''
 artist = ''
 track = ''
+
+radio = None
+config = {}
+
+# Setup logging
+script_dir = os.path.dirname(os.path.abspath(argv[0]))
+
+logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.info("----------")
+
+init_actions()
 
 # Establish lock via socket or exit if failed
 try:
@@ -75,14 +131,7 @@ except:
 	logging.error('Unable to create lock. Another instance of Si4713_RDS_Updater.py running?')
 	exit(1)
 
-@atexit.register
-def cleanup():
-	try:
-		logging.debug('Cleaning up fifo')
-		os.unlink(fifo_path)
-	except:
-		pass
-
+# Setup fifo
 fifo_path = script_dir + "/Si4713_FM_RDS_FIFO"
 try:
 	logging.debug('Setting up read side of fifo %s', fifo_path)
@@ -93,31 +142,7 @@ except OSError as oe:
 	else:
 		logging.debug('Fifo already exists')
 
-radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
-
-def Si4713_start():
-	logging.info('Si4713 Start')
-	if config['Premphasis'] == '50us':
-		radio.preemphasis = 1
-
-	if not radio.begin():
-		logging.error('Unable to initialize radio. Check that the Si4713 is connected, then restart FPPD.')
-		exit(1)
-	radio.setTXpower(int(config['Power']), int(config['AntCap']))
-	radio.tuneFM(int(config['Frequency'].replace('.','')))
-	# TODO: If RDS enabled
-	if config['EnableRDS'] == True:
-		radio.beginRDS()
-		radio.setRDSstation(RDSStation.currentFragment())
-	radio_ready = True
-	logging.info('Radio initialized')
-
-def updateRDSData():
-	logging.info('Updating RDS Data')
-	# TODO: Deal with different RDS options
-	# TODO: RDSStation.updateData...
-	RDSText.updateData('%s%s', title, artist)
-
+# Main loop
 with open(fifo_path, 'r', 0) as fifo:
 	while True:
 		line = fifo.readline().rstrip()
@@ -129,7 +154,7 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line == 'RESET':
 				logging.info('Processing reset')
-				config = read_config()
+				read_config()
 				radio = None
 				radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
 				radio.reset()
@@ -139,6 +164,7 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line == 'INIT':
 				logging.info('Processing init')
+				init_actions()
 				if config['Start'] == "FPPDStart":
 					Si4713_start()
 
@@ -160,6 +186,7 @@ with open(fifo_path, 'r', 0) as fifo:
 				# TODO: Only use title if not blank
 				title = line[1:33].ljust(32)
 				updateRDSData()
+				Si4713_status()
 
 			elif line[0] == 'A':
 				logging.debug('Processing artist')
@@ -176,12 +203,13 @@ with open(fifo_path, 'r', 0) as fifo:
 				logging.error('Unknown fifo input %s', line)
 
 		else:
-			if RDSStation.nextTick():
-				logging.debug('Station Fragment [%s]', RDSStation.currentFragment())
-				radio.setRDSstation(RDSStation.currentFragment())
-			if RDSText.nextTick():
-				logging.debug('Buffer Fragment  [%s]', RDSText.currentFragment())
-				radio.setRDSbuffer(RDSText.currentFragment())
+			if radio_ready:
+				if RDSStation.nextTick():
+					logging.debug('Station Fragment [%s]', RDSStation.currentFragment())
+					radio.setRDSstation(RDSStation.currentFragment())
+				if RDSText.nextTick():
+					logging.debug('Buffer Fragment  [%s]', RDSText.currentFragment())
+					radio.setRDSbuffer(RDSText.currentFragment())
 
 			# Sleep until the top of the next second
 			sleep ((1000000 - datetime.now().microsecond) / 1000000.0)
