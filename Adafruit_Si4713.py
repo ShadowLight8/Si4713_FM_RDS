@@ -89,6 +89,9 @@ class Adafruit_Si4713(Adafruit_I2C):
 		self.currASQ = 0
 		self.currInLevel = 0
 
+		# Additional properties
+		self.preemphasis = 0
+
 		# for restoring state
 		self._freq = None
 		self._power = None
@@ -202,7 +205,7 @@ class Adafruit_Si4713(Adafruit_I2C):
 		#sleep(0.5);
 
 		self.setProperty(self.SI4713_PROP_REFCLK_FREQ, 32768) # crystal is 32.768
-		self.setProperty(self.SI4713_PROP_TX_PREEMPHASIS, 0) # 75uS pre-emph (default for US)
+		self.setProperty(self.SI4713_PROP_TX_PREEMPHASIS, self.preemphasis) # 75uS pre-emph (default for US)
 		self.setProperty(self.SI4713_PROP_TX_ACOMP_ENABLE, 0x03) # turn on limiter and AGC
 		#self.setProperty(self.SI4713_PROP_TX_ACOMP_GAIN, 10) # max gain?
 

@@ -11,37 +11,34 @@ from time import sleep
 from datetime import datetime
 from Adafruit_Si4713 import Adafruit_Si4713
 
-class RDSBuffer(object):
-	data = ''
-	fragments = 0
-	frag = 0
-	delay = 0
-	tick = 0
+class RadioBuffer(object):
+# fragsize: How long the block from data will be. Likely 8 or 32
+# delay: Time, in seconds, between frag updates
+# data: Complete string of all data to be sent
+# fragments: How many block of 8 or 32 characters the data is
+# frag: Current fragment to be sent by radio
+# tick: Counter to track time until next delay interval reached
 
 	def __init__(self, data='', fragsize=8, delay=5):
-		self.data = data
 		self.fragsize = fragsize
-		self.fragments = (len(self.data)-1)//self.fragsize+1 #Private function on data changes?
-		self.frag = 0
 		self.delay = delay
-		self.tick = 0
+		self.updateData(data)
 
 	def updateData(self, data):
-		self.data = data
-		updateFragments() # TODO: Check syntax
-		self.frag = 0
-		self.tick = 0
+		self.data = data.ljust(self.fragsize) # Ensure at least one fragment
+		self.__fragments = (len(self.data) - 1) // self.fragsize + 1
+		self.__tick = self.delay - 1 # Setup nextTick to return true
+		self.__frag = self.__fragments - 1 # Setup currentFragment to start at the beginning
 
-	def updateFragments(self): # TODO: Make private?
-		self.fragments = (len(self.data)-1)//self.fragsize+1
+	def currentFragment(self):
+		return (self.data[self.fragsize * self.__frag:self.fragsize * (self.__frag + 1)]).ljust(self.fragsize)
 
-	def nextTick():
-		# Inc tick, return True if delay reached
-
-	def nextFrag():
-		# Inc frag, return Next fragment
-
-
+	def nextTick(self):
+		self.__tick = (self.__tick + 1) % self.delay
+		if self.__tick == 0:
+			self.__frag = (self.__frag + 1) % self.__fragments
+			return True
+		return False
 
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
@@ -62,29 +59,12 @@ config = read_config()
 
 radio_ready = False
 
-# *_data: Complete string of all data to be sent
-# *_fragments: How many block of 8 or 32 characters the *_data is
-# *_frag: Current fragment being sent by radio
-# *_delay: Time, in seconds, between frag updates
-# *_tick: Counter to track time until next delay interval reached
+RDSStation = RadioBuffer(config['StationText'], 8, int(config['StationDelay']))
+RDSText = RadioBuffer(config['RDSTextText'], 32, int(config['RDSTextDelay']))
 
-#Make station and buffer a common class
-
-station_data = ' Happy  Hallo-     -ween'
-station_fragments = (len(stationdata)-1)//8+1
-station_frag = 0
-station_delay = 4
-station_tick = 0
-
-showartist = True # Should be removed
 title = ''
 artist = ''
 track = ''
-buffer_data = ''
-buffer_fragments = 3
-buffer_frag = 0
-buffer_delay = 6
-buffer_tick = 0
 
 # Establish lock via socket or exit if failed
 try:
@@ -94,10 +74,6 @@ try:
 except:
 	logging.error('Unable to create lock. Another instance of Si4713_RDS_Updater.py running?')
 	exit(1)
-
-# Config from os.path.abspath(argv[0])
-# ../../config/plugin.Si4713_FM_RDS
-# TODO: Not sure this is the right way to locate the config file, but it works
 
 @atexit.register
 def cleanup():
@@ -121,46 +97,58 @@ radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
 
 def Si4713_start():
 	logging.info('Si4713 Start')
+	if config['Premphasis'] == '50us':
+		radio.preemphasis = 1
+
 	if not radio.begin():
 		logging.error('Unable to initialize radio. Check that the Si4713 is connected, then restart FPPD.')
 		exit(1)
-	radio.setTXpower(int(config['Power']))
+	radio.setTXpower(int(config['Power']), int(config['AntCap']))
 	radio.tuneFM(int(config['Frequency'].replace('.','')))
 	# TODO: If RDS enabled
-	radio.beginRDS()
-	radio.setRDSstation(stationdata[0:8])
+	if config['EnableRDS'] == True:
+		radio.beginRDS()
+		radio.setRDSstation(RDSStation.currentFragment())
 	radio_ready = True
 	logging.info('Radio initialized')
+
+def updateRDSData():
+	logging.info('Updating RDS Data')
+	# TODO: Deal with different RDS options
+	# TODO: RDSStation.updateData...
+	RDSText.updateData('%s%s', title, artist)
 
 with open(fifo_path, 'r', 0) as fifo:
 	while True:
 		line = fifo.readline().rstrip()
 		if len(line) > 0:
-			logging.debug('line - %s', line)
 			if line == 'EXIT':
-				logging.info('exit')
+				logging.info('Processing exit')
+				# TODO: Should radio stop?
 				exit()
 
 			elif line == 'RESET':
+				logging.info('Processing reset')
 				config = read_config()
 				radio = None
 				radio = Adafruit_Si4713(resetpin = int(config['GPIONumReset']))
 				radio.reset()
 				radio_ready = False
-				print ('GPIO Number %s reset', config['GPIONumReset'])
+				if config['Start'] == "FPPDStart":
+					Si4713_start()
 
 			elif line == 'INIT':
-				logging.info('init')
+				logging.info('Processing init')
 				if config['Start'] == "FPPDStart":
 					Si4713_start()
 
 			elif line == 'START':
-				logging.info('start')
+				logging.info('Processing start')
 				if config['Start'] == "Playlist":
 					Si4713_start()
 
 			elif line == 'STOP':
-				logging.info('stop')
+				logging.info('Processing stop')
 				if config['Stop'] == "Playlist":
 					radio.reset()
 					radio = None
@@ -168,37 +156,32 @@ with open(fifo_path, 'r', 0) as fifo:
 					logging.info('Radio stopped')
 
 			elif line[0] == 'T':
-				logging.debug('T')
-				title = line[1:33]
-				# Reset RDS buffer and tick to update when title changes
-				logging.info('Reset buffer to title [' + title + ']')
-				radio.setRDSbuffer(title)
-				buffertick = 0
+				logging.debug('Processing title')
+				# TODO: Only use title if not blank
+				title = line[1:33].ljust(32)
+				updateRDSData()
 
 			elif line[0] == 'A':
-				logging.debug('A')
-				artist = line[1:33]
+				logging.debug('Processing artist')
+				artist = line[1:33].ljust(32)
+				updateRDSData()
+
+			elif line[0] == 'N':
+				logging.debug('Processing track number')
+				# TODO: Handle track number suffix " of 4" here?
+				track = line[1:33].ljust(32)
+				updateRDSData()
 
 			else:
-				# TODO: ?
-				logging.info('else')
+				logging.error('Unknown fifo input %s', line)
 
 		else:
-			stationtick = (stationtick + 1) % stationdelay
-			if radio_ready and stationtick == 0:
-				logging.info('Set station to fragment ' + str(stationfrag) + ' [' + stationdata[8*stationfrag:8*(stationfrag+1)] + ']')
-				radio.setRDSstation(stationdata[8*stationfrag:8*(stationfrag+1)])
-				stationfrag = (stationfrag + 1) % stationfragments
-
-			buffertick = (buffertick + 1) % bufferdelay
-			if radio_ready and buffertick == 0:
-				if showartist:
-					logging.info('Set buffer to artist [' + artist + ']')
-					radio.setRDSbuffer(artist)
-				else:
-					logging.info('Set buffer to title [' + title + ']')
-					radio.setRDSbuffer(title)
-				showartist = not showartist
+			if RDSStation.nextTick():
+				logging.debug('Station Fragment [%s]', RDSStation.currentFragment())
+				radio.setRDSstation(RDSStation.currentFragment())
+			if RDSText.nextTick():
+				logging.debug('Buffer Fragment  [%s]', RDSText.currentFragment())
+				radio.setRDSbuffer(RDSText.currentFragment())
 
 			# Sleep until the top of the next second
 			sleep ((1000000 - datetime.now().microsecond) / 1000000.0)

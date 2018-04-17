@@ -67,7 +67,6 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <br /><sup>*</sup>Can be set as high as 120dB&mu;V, but voltage accuracy above 115dB&mu;V is not guaranteed.</p>
 <p>Preemphasis: <?php PrintSettingSelect("Preemphasis", "Preemphasis", 0, 0, "75us", Array("50&mu;s (Europe, Australia, Japan)"=>"50us", "75&mu;s (USA, default)"=>"75us"), "Si4713_FM_RDS", ""); ?></p>
 <p>Antenna Tuning Capacitor (0=Auto, 1-191): <?php PrintSettingText("AntCap", 0, 0, 3, 3, "Si4713_FM_RDS", "0"); ?> * 0.25pF <?php PrintSettingSave("AntCap", "AntCap", 0, 0, "Si4713_FM_RDS"); ?></p>
-<p>(TODO: Audio limiter and compression, maybe a separate section)</p>
 </fieldset>
 </div>
 
@@ -76,18 +75,33 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <div id="Si4713RDSsettings" class="settings">
 <fieldset>
 <legend>Si4713 RDS Settings</legend>
-<p>Enable RDS</p>
+<p>Enable RDS: <?php PrintSettingCheckbox("EnableRDS", "EnableRDS", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
 <p>Difference between RDS Station and RDS Text</p>
-<p>RDS Station (8 char at a time)</p>
-<p>... Refresh Rate</p>
-<p>... include Title</p>
-<p>... include Artist</p>
-<p>... include Track + "of XX"</p>
-<p>RDS Text</p>
-<p>... Refresh Rate</p> 
-<p>... include Title</p>
-<p>... include Artist</p>
-<p>... include Track + "of XX"</p>
+<p>RDS Station - Sent 8 characters at a time</p>
+<p>Delay between blocks (>3): <?php PrintSettingText("StationDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "4"); ?>seconds <?php PrintSettingSave("StationDelay", "StationDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Static Text (can be blank): <?php PrintSettingText("StationText", 1, 0, 64, 32, "Si4713_FM_RDS", " Happy  Hallo-     -ween"); ?><?php PrintSettingSave("StationText", "StationText", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Include Title: <?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+ --- Include Artist: <?php PrintSettingCheckbox("StationArtist", "StationArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+ --- Include Track Number: <?php PrintSettingCheckbox("StationTrackNum", "StationTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+
+<br />
+
+<p>RDS Text - Sent 32 characters at a time</p>
+<p>Delay between blocks (>3): <?php PrintSettingText("RDSTextDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "7"); ?>seconds <?php PrintSettingSave("RDSTestDelay", "RDSTextDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Static Text (can be blank): <?php PrintSettingText("RDSTextText", 1, 0, 64, 32, "Si4713_FM_RDS", ""); ?><?php PrintSettingSave("RDSTextText", "StationText", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Include Title: <?php PrintSettingCheckbox("RDSTextTitle", "RDSTextTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+ --- Include Artist: <?php PrintSettingCheckbox("RDSTextArtist", "RDSTextArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+ --- Include Track Number: <?php PrintSettingCheckbox("RDSTextTrackNum", "RDSTextTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+</fieldset>
+</div>
+
+<br />
+
+<div id="Si4713Debug" class="settings">
+<fieldset>
+<legend>Si4713 Debugging</legend>
+<p>Link to logs</p>
+<p>Info about radio settings</p>
 </fieldset>
 </div>
 
