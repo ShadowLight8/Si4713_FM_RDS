@@ -76,11 +76,11 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <fieldset>
 <legend>Si4713 RDS Settings</legend>
 <p>Enable RDS: <?php PrintSettingCheckbox("EnableRDS", "EnableRDS", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
-<!-- p>Difference between RDS Station and RDS Text</p -->
+<p>Difference between RDS Station and RDS Text</p>
 <p>RDS Station - Sent 8 characters at a time</p>
 <p>Delay between blocks (>3): <?php PrintSettingText("StationDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "4"); ?>seconds <?php PrintSettingSave("StationDelay", "StationDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
 <p>Static Text (can be blank): <?php PrintSettingText("StationText", 1, 0, 64, 32, "Si4713_FM_RDS", " Happy  Hallo-     -ween"); ?><?php PrintSettingSave("StationText", "StationText", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p style="display: none">Include Title: <?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+<p>Include Title: <?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
  --- Include Artist: <?php PrintSettingCheckbox("StationArtist", "StationArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
  --- Include Track Number: <?php PrintSettingCheckbox("StationTrackNum", "StationTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
 
@@ -97,7 +97,7 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 
 <br />
 
-<div id="Si4713Debug" class="settings" style="display: none">
+<div id="Si4713Debug" class="settings">
 <fieldset>
 <legend>Si4713 Debugging</legend>
 <p>TODO: Link to logs</p>
@@ -106,7 +106,7 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 </fieldset>
 </div>
 
-<!-- br /-->
+<br />
 
 <div id="Si4713Info" class="settings">
 <fieldset>

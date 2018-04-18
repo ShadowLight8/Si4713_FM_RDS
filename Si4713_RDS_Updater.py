@@ -94,12 +94,16 @@ def Si4713_status():
 	logging.info('Power: %s dBuV - ANTcap: %s - Noise level: %s - Frequency: %s', radio.currdBuV, radio.currAntCap, radio.currNoiseLevel, radio.currFreq)
 	radio.readASQ()
 	logging.info('ASQ: %s - InLevel: %s dBfs', hex(radio.currASQ), radio.currInLevel)
+	# TODO: Watch for incorrect power or frequency, restart if needed
 
 def updateRDSData():
 	logging.info('Updating RDS Data')
 	# TODO: Deal with different RDS options
 	# TODO: RDSStation.updateData...
-	RDSText.updateData(title + artist)
+	logging.debug('Title %s', title)
+	logging.debug('Artist %s', artist)
+	logging.debug('Tracknum %s', tracknum)
+	RDSText.updateData(title + artist + tracknum)
 
 # Common variables
 radio_ready = False
@@ -109,7 +113,8 @@ RDSText = RadioBuffer('', 32, 7)
 
 title = ''
 artist = ''
-track = ''
+tracknum = ''
+length = 0
 
 radio = None
 config = {}
@@ -181,23 +186,33 @@ with open(fifo_path, 'r', 0) as fifo:
 					radio_ready = False
 					logging.info('Radio stopped')
 
+			# TODO: Logic issue with determining a blank title, artist, tracknum? To fix first
 			elif line[0] == 'T':
 				logging.debug('Processing title')
-				# TODO: Only use title if not blank
-				title = line[1:33].ljust(32)
+				title = line[1:33].ljust(32) if len(line) == 1 else ''
 				updateRDSData()
+				# TODO: Best place for status check?
 				Si4713_status()
 
 			elif line[0] == 'A':
 				logging.debug('Processing artist')
-				artist = line[1:33].ljust(32)
+				artist = line[1:33].ljust(32) if len(line) == 1 else ''
 				updateRDSData()
 
 			elif line[0] == 'N':
 				logging.debug('Processing track number')
-				# TODO: Handle track number suffix " of 4" here?
-				track = line[1:33].ljust(32)
+				# TODO: Handle track number prefix and suffix here?
+				if line[1] == '0':
+					tracknum = ''
+				else:
+					tracknum = 'Track ' + line[1:10] + ' of X'
+					tracknum.ljust(32)
 				updateRDSData()
+
+			elif line[0] == 'L':
+				logging.debug('Processing length')
+				length = int(line[1:10])
+				# TODO: Store length less a bit, countdown, at 0 clear RDSbuffers
 
 			else:
 				logging.error('Unknown fifo input %s', line)
@@ -210,6 +225,13 @@ with open(fifo_path, 'r', 0) as fifo:
 				if RDSText.nextTick():
 					logging.debug('Buffer Fragment  [%s]', RDSText.currentFragment())
 					radio.setRDSbuffer(RDSText.currentFragment())
+
+			length = length - 1
+			if length == 0:
+				title = ''
+				artist = ''
+				tracknum = ''
+				updateRDSData()
 
 			# Sleep until the top of the next second
 			sleep ((1000000 - datetime.now().microsecond) / 1000000.0)
