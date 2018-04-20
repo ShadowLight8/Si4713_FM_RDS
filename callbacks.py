@@ -77,8 +77,8 @@ with open(fifo_path, 'w') as fifo:
 		media_type = j['type'] if 'type' in j else 'pause'
 		media_title = j['title'] if 'title' in j else ''
 		media_artist = j['artist'] if 'artist' in j else ''
-		media_tracknum = j['track'] if 'track' in j else '0'
-		media_length = j['length'] if 'length' in j else '0'
+		media_tracknum = str(j['track']) if 'track' in j else '0'
+		media_length = str(j['length']) if 'length' in j else '0'
 
 		logging.debug('Type is %s', media_type)
 		logging.debug('Title is %s', media_title)

@@ -103,6 +103,17 @@ def updateRDSData():
 	logging.debug('Title %s', title)
 	logging.debug('Artist %s', artist)
 	logging.debug('Tracknum %s', tracknum)
+
+	#ljust(len(title) + 32 - len(title) % 32)
+
+	logging.debug('TEST [{t: <{tw}}]'.format(t=title, tw=(len(title) - 1) // 32))
+
+# len 0 -> tw = 0
+# len 1 -> tw = 32
+# len 31 -> tw = 32
+# len 32 -> tw = 32
+# len 33 -> tw = 64
+
 	RDSText.updateData(title + artist + tracknum)
 
 # Common variables
@@ -152,6 +163,7 @@ with open(fifo_path, 'r', 0) as fifo:
 	while True:
 		line = fifo.readline().rstrip()
 		if len(line) > 0:
+			logging.debug('line %s', line)
 			if line == 'EXIT':
 				logging.info('Processing exit')
 				# TODO: Should radio stop?
@@ -180,24 +192,27 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line == 'STOP':
 				logging.info('Processing stop')
+				# TODO: Clear RDS back to defaults
 				if config['Stop'] == "Playlist":
 					radio.reset()
 					radio = None
 					radio_ready = False
 					logging.info('Radio stopped')
 
-			# TODO: Logic issue with determining a blank title, artist, tracknum? To fix first
 			elif line[0] == 'T':
 				logging.debug('Processing title')
-				title = line[1:33].ljust(32) if len(line) == 1 else ''
-				updateRDSData()
+				title = line[1:] # Not sure if this is needed: if len(line) > 1 else ''
+				#updateRDSData()
 				# TODO: Best place for status check?
-				Si4713_status()
+				#Si4713_status()
 
 			elif line[0] == 'A':
 				logging.debug('Processing artist')
-				artist = line[1:33].ljust(32) if len(line) == 1 else ''
-				updateRDSData()
+				if len(line) == 1:
+					artist = ''
+				else:
+					artist = line[1:33].ljust(32)
+				#updateRDSData()
 
 			elif line[0] == 'N':
 				logging.debug('Processing track number')
@@ -213,6 +228,8 @@ with open(fifo_path, 'r', 0) as fifo:
 				logging.debug('Processing length')
 				length = int(line[1:10])
 				# TODO: Store length less a bit, countdown, at 0 clear RDSbuffers
+				# TANL is always sent together with L being last, so we only need to update the RDS Data once with the new values
+				updateRDSData()
 
 			else:
 				logging.error('Unknown fifo input %s', line)
