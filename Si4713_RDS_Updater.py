@@ -80,10 +80,11 @@ def Si4713_start():
 
 	radio.setTXpower(int(config['Power']), int(config['AntCap']))
 	radio.tuneFM(int(config['Frequency'].replace('.','')))
-	# TODO: If RDS enabled
+
 	if config['EnableRDS'] == 'True':
 		radio.beginRDS()
 		radio.setRDSstation(RDSStation.currentFragment())
+
 	radio_ready = True
 	logging.info('Radio initialized')
 	Si4713_status()
@@ -103,14 +104,37 @@ def updateRDSData():
 	logging.debug('Title %s', title)
 	logging.debug('Artist %s', artist)
 	logging.debug('Tracknum %s', tracknum)
+	
+	tmp_StationTitle = title if config['StationTitle'] == 'True' else ''
+	tmp_StationArtist = artist if config['StationArtist'] == 'True' else ''
+	tmp_StationTrackNum = ''
+	if config['StationTrackNum'] == 'True' and tracknum != '0' and tracknum !='':
+		tmp_StationTrackNum = '{} {} {}'.format(config['StationTrackNumPre'], tracknum, config['StationTrackNumSuf']).strip()
 
-	trackstr = 'Track {} of 4'.format(tracknum) if tracknum != '0' and tracknum != '' else ''
+	tmp_RDSTextTitle = title if config['RDSTextTitle'] == 'True' else ''
+	tmp_RDSTextArtist = artist if config['RDSTextArtist'] == 'True' else ''
+	# TODO: Prefix and Suffix for Track Num
+	tmp_RDSTextTrackNum = ''
+	if config['RDSTextTrackNum'] == 'True' and tracknum != '0' and tracknum !='':
+		tmp_RDSTextTrackNum = '{} {} {}'.format(config['RDSTextTrackNumPre'], tracknum, config['RDSTextTrackNumSuf']).strip()
 
-	RDSTextstr = '{t: <{tw}}{a: <{aw}}{n: <{nw}}'.format(t=title, tw=nearest(title,32), \
-		a=artist, aw=nearest(artist,32), \
-		n=trackstr, nw=nearest(trackstr, 32))
 
+	Stationstr = '{s: <{sw}}{t: <{tw}}{a: <{aw}}{n: <{nw}}'.format( \
+		s=config['StationText'], sw=nearest(config['StationText'], 8), \
+		t=tmp_StationTitle, tw=nearest(tmp_StationTitle, 8), \
+		a=tmp_StationArtist, aw=nearest(tmp_StationArtist, 8), \
+		n=tmp_StationTrackNum, nw=nearest(tmp_StationTrackNum, 8))
+
+	RDSTextstr = '{s: <{sw}}{t: <{tw}}{a: <{aw}}{n: <{nw}}'.format( \
+		s=config['RDSTextText'], sw=nearest(config['RDSTextText'], 32), \
+		t=tmp_RDSTextTitle, tw=nearest(tmp_RDSTextTitle,32), \
+		a=tmp_RDSTextArtist, aw=nearest(tmp_RDSTextArtist,32), \
+		n=tmp_RDSTextTrackNum, nw=nearest(tmp_RDSTextTrackNum, 32))
+
+	logging.debug('Updated Station Text [%s]', Stationstr)
 	logging.debug('Updated RDS Text [%s]', RDSTextstr)
+
+	RDSStation.updateData(Stationstr)
 	RDSText.updateData(RDSTextstr)
 
 def nearest(str, size):

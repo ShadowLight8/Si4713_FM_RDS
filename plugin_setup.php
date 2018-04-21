@@ -63,7 +63,7 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <legend>Si4713 FM Settings</legend>
 
 <p>Frequency (76.00-108.00): <?php PrintSettingText("Frequency", 1, 0, 6, 6, "Si4713_FM_RDS", "100.10"); ?>MHz <?php PrintSettingSave("Frequency", "Frequency", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p>Power (88-115, 116-120<sup>*</sup>): <?php PrintSettingText("Power", 1, 0, 3, 3, "Si4713_FM_RDS", "90"); ?>dB&mu;V <?php PrintSettingSave("Power", "Power", 1, 0, "Si4713_FM_RDS"); ?>
+<p>Power (88-115, 116-120<sup>*</sup>): <?php PrintSettingText("Power", 1, 0, 3, 3, "Si4713_FM_RDS", "95"); ?>dB&mu;V <?php PrintSettingSave("Power", "Power", 1, 0, "Si4713_FM_RDS"); ?>
 <br /><sup>*</sup>Can be set as high as 120dB&mu;V, but voltage accuracy above 115dB&mu;V is not guaranteed.</p>
 <p>Preemphasis: <?php PrintSettingSelect("Preemphasis", "Preemphasis", 1, 0, "75us", Array("50&mu;s (Europe, Australia, Japan)"=>"50us", "75&mu;s (USA, default)"=>"75us"), "Si4713_FM_RDS", ""); ?></p>
 <p>Antenna Tuning Capacitor (0=Auto, 1-191): <?php PrintSettingText("AntCap", 1, 0, 3, 3, "Si4713_FM_RDS", "0"); ?> * 0.25pF <?php PrintSettingSave("AntCap", "AntCap", 1, 0, "Si4713_FM_RDS"); ?></p>
@@ -76,22 +76,27 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <fieldset>
 <legend>Si4713 RDS Settings</legend>
 <p>Enable RDS: <?php PrintSettingCheckbox("EnableRDS", "EnableRDS", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
-<p>Difference between RDS Station and RDS Text</p>
+<br />
+<p>TODO: Difference between RDS Station and RDS Text</p>
 <p>RDS Station - Sent 8 characters at a time</p>
-<p>Delay between blocks (>3): <?php PrintSettingText("StationDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "4"); ?>seconds <?php PrintSettingSave("StationDelay", "StationDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p>Static Text (can be blank): <?php PrintSettingText("StationText", 1, 0, 64, 32, "Si4713_FM_RDS", " Happy  Hallo-     -ween"); ?><?php PrintSettingSave("StationText", "StationText", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p>Include Title: <?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
- --- Include Artist: <?php PrintSettingCheckbox("StationArtist", "StationArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
- --- Include Track Number: <?php PrintSettingCheckbox("StationTrackNum", "StationTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p>Delay between 8 character blocks (&gt;=3): <?php PrintSettingText("StationDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "4"); ?>seconds <?php PrintSettingSave("StationDelay", "StationDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Static Text (can be blank): <?php PrintSettingText("StationText", 1, 0, 64, 32, "Si4713_FM_RDS", "Happy   Hallo-     -ween"); ?><?php PrintSettingSave("StationText", "StationText", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Display Title: <?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p>Display Artist: <?php PrintSettingCheckbox("StationArtist", "StationArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p>Display Track Number: <?php PrintSettingCheckbox("StationTrackNum", "StationTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p>Track Number Prefix (can be blank): <?php PrintSettingText("StationTrackNumPre", 1, 0, 64, 8, "Si4713_FM_RDS", ""); ?><?php PrintSettingSave("StationTrackNumPre", "StationTrackNumPre", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Track Number Suffix (can be blank): <?php PrintSettingText("StationTrackNumSuf", 1, 0, 64, 8, "Si4713_FM_RDS", "of 4"); ?><?php PrintSettingSave("StationTrackNumSuf", "StationTrackNumSuf", 1, 0, "Si4713_FM_RDS"); ?></p>
 
 <br />
 
 <p>RDS Text - Sent 32 characters at a time</p>
-<p>Delay between blocks (>3): <?php PrintSettingText("RDSTextDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "7"); ?>seconds <?php PrintSettingSave("RDSTestDelay", "RDSTextDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Delay between 32 character blocks (&gt;=3): <?php PrintSettingText("RDSTextDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "7"); ?>seconds <?php PrintSettingSave("RDSTestDelay", "RDSTextDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
 <p>Static Text (can be blank): <?php PrintSettingText("RDSTextText", 1, 0, 64, 32, "Si4713_FM_RDS", ""); ?><?php PrintSettingSave("RDSTextText", "RDSTextText", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p>Include Title: <?php PrintSettingCheckbox("RDSTextTitle", "RDSTextTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
- --- Include Artist: <?php PrintSettingCheckbox("RDSTextArtist", "RDSTextArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
-<p style="display: none"> --- Include Track Number: <?php PrintSettingCheckbox("RDSTextTrackNum", "RDSTextTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p>Display Title: <?php PrintSettingCheckbox("RDSTextTitle", "RDSTextTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+<p>Display Artist: <?php PrintSettingCheckbox("RDSTextArtist", "RDSTextArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?>
+<p>Display Track Number: <?php PrintSettingCheckbox("RDSTextTrackNum", "RDSTextTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p>Track Number Prefix (can be blank): <?php PrintSettingText("RDSTextTrackNumPre", 1, 0, 64, 8, "Si4713_FM_RDS", "Track"); ?><?php PrintSettingSave("RDSTextTrackNumPre", "RDSTextTrackNumPre", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Track Number Suffix (can be blank): <?php PrintSettingText("RDSTextTrackNumSuf", 1, 0, 64, 8, "Si4713_FM_RDS", "of 4"); ?><?php PrintSettingSave("RDSTextTrackNumSuf", "RDSTextTrackNumSuf", 1, 0, "Si4713_FM_RDS"); ?></p>
 </fieldset>
 </div>
 
