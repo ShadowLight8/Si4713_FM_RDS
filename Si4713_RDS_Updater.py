@@ -104,17 +104,18 @@ def updateRDSData():
 	logging.debug('Artist %s', artist)
 	logging.debug('Tracknum %s', tracknum)
 
-	#ljust(len(title) + 32 - len(title) % 32)
+	trackstr = 'Track {} of 4'.format(tracknum) if tracknum != '0' and tracknum != '' else ''
 
-	logging.debug('TEST [{t: <{tw}}]'.format(t=title, tw=(len(title) - 1) // 32))
+	RDSTextstr = '{t: <{tw}}{a: <{aw}}{n: <{nw}}'.format(t=title, tw=nearest(title,32), \
+		a=artist, aw=nearest(artist,32), \
+		n=trackstr, nw=nearest(trackstr, 32))
 
-# len 0 -> tw = 0
-# len 1 -> tw = 32
-# len 31 -> tw = 32
-# len 32 -> tw = 32
-# len 33 -> tw = 64
+	logging.debug('Updated RDS Text [%s]', RDSTextstr)
+	RDSText.updateData(RDSTextstr)
 
-	RDSText.updateData(title + artist + tracknum)
+def nearest(str, size):
+	# -(-X // Y) functions as ceiling division
+	return -(-len(str) // size) * size
 
 # Common variables
 radio_ready = False
@@ -201,35 +202,24 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line[0] == 'T':
 				logging.debug('Processing title')
-				title = line[1:] # Not sure if this is needed: if len(line) > 1 else ''
-				#updateRDSData()
-				# TODO: Best place for status check?
-				#Si4713_status()
+				title = line[1:]
 
 			elif line[0] == 'A':
 				logging.debug('Processing artist')
-				if len(line) == 1:
-					artist = ''
-				else:
-					artist = line[1:33].ljust(32)
-				#updateRDSData()
+				artist = line[1:]
 
 			elif line[0] == 'N':
 				logging.debug('Processing track number')
-				# TODO: Handle track number prefix and suffix here?
-				if line[1] == '0':
-					tracknum = ''
-				else:
-					tracknum = 'Track ' + line[1:10] + ' of X'
-					tracknum.ljust(32)
+				tracknum = line[1:]
+				# TANL is always sent together with N being last item for RDS, so we only need to update the RDS Data once with the new values
 				updateRDSData()
+				Si4713_status()
 
 			elif line[0] == 'L':
 				logging.debug('Processing length')
-				length = int(line[1:10])
+				length = int(line[1:10]) - max(int(config['StationDelay']), int(config['RDSTextDelay']))
+				logging.debug('Length %s', int(length))
 				# TODO: Store length less a bit, countdown, at 0 clear RDSbuffers
-				# TANL is always sent together with L being last, so we only need to update the RDS Data once with the new values
-				updateRDSData()
 
 			else:
 				logging.error('Unknown fifo input %s', line)
