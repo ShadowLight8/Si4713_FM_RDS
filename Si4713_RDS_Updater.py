@@ -99,8 +99,6 @@ def Si4713_status():
 
 def updateRDSData():
 	logging.info('Updating RDS Data')
-	# TODO: Deal with different RDS options
-	# TODO: RDSStation.updateData...
 	logging.debug('Title %s', title)
 	logging.debug('Artist %s', artist)
 	logging.debug('Tracknum %s', tracknum)
@@ -113,11 +111,9 @@ def updateRDSData():
 
 	tmp_RDSTextTitle = title if config['RDSTextTitle'] == 'True' else ''
 	tmp_RDSTextArtist = artist if config['RDSTextArtist'] == 'True' else ''
-	# TODO: Prefix and Suffix for Track Num
 	tmp_RDSTextTrackNum = ''
 	if config['RDSTextTrackNum'] == 'True' and tracknum != '0' and tracknum !='':
 		tmp_RDSTextTrackNum = '{} {} {}'.format(config['RDSTextTrackNumPre'], tracknum, config['RDSTextTrackNumSuf']).strip()
-
 
 	Stationstr = '{s: <{sw}}{t: <{tw}}{a: <{aw}}{n: <{nw}}'.format( \
 		s=config['StationText'], sw=nearest(config['StationText'], 8), \
@@ -158,7 +154,7 @@ config = {}
 # Setup logging
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.INFO, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info("----------")
 
 init_actions()
@@ -191,7 +187,7 @@ with open(fifo_path, 'r', 0) as fifo:
 			logging.debug('line %s', line)
 			if line == 'EXIT':
 				logging.info('Processing exit')
-				# TODO: Should radio stop?
+				radio.reset()
 				exit()
 
 			elif line == 'RESET':
@@ -217,7 +213,11 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line == 'STOP':
 				logging.info('Processing stop')
-				# TODO: Clear RDS back to defaults
+				title = ''
+				artist = ''
+				tracknum = ''
+				updateRDSData()
+
 				if config['Stop'] == "Playlist":
 					radio.reset()
 					radio = None
@@ -237,13 +237,13 @@ with open(fifo_path, 'r', 0) as fifo:
 				tracknum = line[1:]
 				# TANL is always sent together with N being last item for RDS, so we only need to update the RDS Data once with the new values
 				updateRDSData()
+				# Check radio status between each track
 				Si4713_status()
 
 			elif line[0] == 'L':
 				logging.debug('Processing length')
-				length = int(line[1:10]) - max(int(config['StationDelay']), int(config['RDSTextDelay']))
+				length = max(int(line[1:10]) - max(int(config['StationDelay']), int(config['RDSTextDelay'])), 1)
 				logging.debug('Length %s', int(length))
-				# TODO: Store length less a bit, countdown, at 0 clear RDSbuffers
 
 			else:
 				logging.error('Unknown fifo input %s', line)
