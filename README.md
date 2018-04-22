@@ -20,7 +20,7 @@ FPP reads the Title, Artist, Track Number, and Length from the media's metadata,
 ### TODO: Initial setup - Software
 
 ## Credits, Thanks, and Links
-###Adafruit's Si4713 Breakout Board
+### Adafruit's Si4713 Breakout Board
 https://www.adafruit.com/product/1958
 
 ### Python class for Si4713
