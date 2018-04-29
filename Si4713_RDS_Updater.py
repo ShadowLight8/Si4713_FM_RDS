@@ -90,11 +90,10 @@ def Si4713_start():
 	Si4713_status()
 	
 def Si4713_status():
-	logging.info('Radio status')
+	logging.debug('Radio status')
 	radio.readTuneStatus()
-	logging.info('Power: %s dBuV - ANTcap: %s - Noise level: %s - Frequency: %s', radio.currdBuV, radio.currAntCap, radio.currNoiseLevel, radio.currFreq)
 	radio.readASQ()
-	logging.info('ASQ: %s - InLevel: %s dBfs', hex(radio.currASQ), radio.currInLevel)
+	logging.info('Radio status --- Power: %s dBuV - ANTcap: %s - Noise level: %s - Frequency: %s - ASQ: %s - Inlevel: %s dBfs', radio.currdBuV, radio.currAntCap, radio.currNoiseLevel, radio.currFreq, hex(radio.currASQ), radio.currInLevel)
 	# TODO: Watch for incorrect power or frequency, restart if needed
 
 def updateRDSData():
@@ -127,8 +126,8 @@ def updateRDSData():
 		a=tmp_RDSTextArtist, aw=nearest(tmp_RDSTextArtist,32), \
 		n=tmp_RDSTextTrackNum, nw=nearest(tmp_RDSTextTrackNum, 32))
 
-	logging.debug('Updated Station Text [%s]', Stationstr)
-	logging.debug('Updated RDS Text [%s]', RDSTextstr)
+	logging.info('Updated Station Text [%s]', Stationstr)
+	logging.info('Updated RDS Text [%s]', RDSTextstr)
 
 	RDSStation.updateData(Stationstr)
 	RDSText.updateData(RDSTextstr)
