@@ -80,26 +80,61 @@ def Si4713_start():
 
 	radio.setTXpower(int(config['Power']), int(config['AntCap']))
 	radio.tuneFM(int(config['Frequency'].replace('.','')))
-	# TODO: If RDS enabled
+
 	if config['EnableRDS'] == 'True':
 		radio.beginRDS()
 		radio.setRDSstation(RDSStation.currentFragment())
+
 	radio_ready = True
 	logging.info('Radio initialized')
 	Si4713_status()
 	
 def Si4713_status():
-	logging.info('Radio status')
+	logging.debug('Radio status')
 	radio.readTuneStatus()
-	logging.info('Power: %s dBuV - ANTcap: %s - Noise level: %s - Frequency: %s', radio.currdBuV, radio.currAntCap, radio.currNoiseLevel, radio.currFreq)
 	radio.readASQ()
-	logging.info('ASQ: %s - InLevel: %s dBfs', hex(radio.currASQ), radio.currInLevel)
+	logging.info('Radio status --- Power: %s dBuV - ANTcap: %s - Noise level: %s - Frequency: %s - ASQ: %s - Inlevel: %s dBfs', radio.currdBuV, radio.currAntCap, radio.currNoiseLevel, radio.currFreq, hex(radio.currASQ), radio.currInLevel)
+	# TODO: Watch for incorrect power or frequency, restart if needed
 
 def updateRDSData():
 	logging.info('Updating RDS Data')
-	# TODO: Deal with different RDS options
-	# TODO: RDSStation.updateData...
-	RDSText.updateData(title + artist)
+	logging.debug('Title %s', title)
+	logging.debug('Artist %s', artist)
+	logging.debug('Tracknum %s', tracknum)
+	
+	tmp_StationTitle = title if config['StationTitle'] == 'True' else ''
+	tmp_StationArtist = artist if config['StationArtist'] == 'True' else ''
+	tmp_StationTrackNum = ''
+	if config['StationTrackNum'] == 'True' and tracknum != '0' and tracknum !='':
+		tmp_StationTrackNum = '{} {} {}'.format(config['StationTrackNumPre'], tracknum, config['StationTrackNumSuf']).strip()
+
+	tmp_RDSTextTitle = title if config['RDSTextTitle'] == 'True' else ''
+	tmp_RDSTextArtist = artist if config['RDSTextArtist'] == 'True' else ''
+	tmp_RDSTextTrackNum = ''
+	if config['RDSTextTrackNum'] == 'True' and tracknum != '0' and tracknum !='':
+		tmp_RDSTextTrackNum = '{} {} {}'.format(config['RDSTextTrackNumPre'], tracknum, config['RDSTextTrackNumSuf']).strip()
+
+	Stationstr = '{s: <{sw}}{t: <{tw}}{a: <{aw}}{n: <{nw}}'.format( \
+		s=config['StationText'], sw=nearest(config['StationText'], 8), \
+		t=tmp_StationTitle, tw=nearest(tmp_StationTitle, 8), \
+		a=tmp_StationArtist, aw=nearest(tmp_StationArtist, 8), \
+		n=tmp_StationTrackNum, nw=nearest(tmp_StationTrackNum, 8))
+
+	RDSTextstr = '{s: <{sw}}{t: <{tw}}{a: <{aw}}{n: <{nw}}'.format( \
+		s=config['RDSTextText'], sw=nearest(config['RDSTextText'], 32), \
+		t=tmp_RDSTextTitle, tw=nearest(tmp_RDSTextTitle,32), \
+		a=tmp_RDSTextArtist, aw=nearest(tmp_RDSTextArtist,32), \
+		n=tmp_RDSTextTrackNum, nw=nearest(tmp_RDSTextTrackNum, 32))
+
+	logging.info('Updated Station Text [%s]', Stationstr)
+	logging.info('Updated RDS Text [%s]', RDSTextstr)
+
+	RDSStation.updateData(Stationstr)
+	RDSText.updateData(RDSTextstr)
+
+def nearest(str, size):
+	# -(-X // Y) functions as ceiling division
+	return -(-len(str) // size) * size
 
 # Common variables
 radio_ready = False
@@ -109,7 +144,8 @@ RDSText = RadioBuffer('', 32, 7)
 
 title = ''
 artist = ''
-track = ''
+tracknum = ''
+length = 0
 
 radio = None
 config = {}
@@ -117,7 +153,7 @@ config = {}
 # Setup logging
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.INFO, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info("----------")
 
 init_actions()
@@ -147,9 +183,10 @@ with open(fifo_path, 'r', 0) as fifo:
 	while True:
 		line = fifo.readline().rstrip()
 		if len(line) > 0:
+			logging.debug('line %s', line)
 			if line == 'EXIT':
 				logging.info('Processing exit')
-				# TODO: Should radio stop?
+				radio.reset()
 				exit()
 
 			elif line == 'RESET':
@@ -175,6 +212,11 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line == 'STOP':
 				logging.info('Processing stop')
+				title = ''
+				artist = ''
+				tracknum = ''
+				updateRDSData()
+
 				if config['Stop'] == "Playlist":
 					radio.reset()
 					radio = None
@@ -183,21 +225,24 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line[0] == 'T':
 				logging.debug('Processing title')
-				# TODO: Only use title if not blank
-				title = line[1:33].ljust(32)
-				updateRDSData()
-				Si4713_status()
+				title = line[1:]
 
 			elif line[0] == 'A':
 				logging.debug('Processing artist')
-				artist = line[1:33].ljust(32)
-				updateRDSData()
+				artist = line[1:]
 
 			elif line[0] == 'N':
 				logging.debug('Processing track number')
-				# TODO: Handle track number suffix " of 4" here?
-				track = line[1:33].ljust(32)
+				tracknum = line[1:]
+				# TANL is always sent together with N being last item for RDS, so we only need to update the RDS Data once with the new values
 				updateRDSData()
+				# Check radio status between each track
+				Si4713_status()
+
+			elif line[0] == 'L':
+				logging.debug('Processing length')
+				length = max(int(line[1:10]) - max(int(config['StationDelay']), int(config['RDSTextDelay'])), 1)
+				logging.debug('Length %s', int(length))
 
 			else:
 				logging.error('Unknown fifo input %s', line)
@@ -210,6 +255,13 @@ with open(fifo_path, 'r', 0) as fifo:
 				if RDSText.nextTick():
 					logging.debug('Buffer Fragment  [%s]', RDSText.currentFragment())
 					radio.setRDSbuffer(RDSText.currentFragment())
+
+			length = length - 1
+			if length == 0:
+				title = ''
+				artist = ''
+				tracknum = ''
+				updateRDSData()
 
 			# Sleep until the top of the next second
 			sleep ((1000000 - datetime.now().microsecond) / 1000000.0)

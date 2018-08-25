@@ -21,9 +21,11 @@ if len(argv) <= 1:
 
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=script_dir + '/Si4713_callbacks.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename=script_dir + '/Si4713_callbacks.log', level=logging.INFO, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info('----------')
 logging.debug('Arguments %s', argv[1:])
+
+# Environ has a few useful items when FPPD runs callbacks.py, but logging it all the time, even at debug, is too much
 #logging.debug('Environ %s', os.environ)
 
 # Always start the Updater since it does the real work for all command
@@ -65,31 +67,36 @@ with open(fifo_path, 'w') as fifo:
 		# Not used by FPPD, but useful for testing
 		fifo.write('EXIT\n')
 
-	elif argv[2] == 'media':
-		# TODO: When not type:pause or event?
+	elif argv[1] == '--type' and argv[2] == 'media':
 		logging.info('Type media')
 		
 		# TODO: Exception handling for json?
 		j = json.loads(argv[4])
 
+		# When default values are sent over fifo, other side more or less ignores them
 		media_type = j['type'] if 'type' in j else 'pause'
-		media_title = j['title'] if 'title' in j else '-'
+		media_title = j['title'] if 'title' in j else ''
 		media_artist = j['artist'] if 'artist' in j else ''
-		# TODO: Enhancement - Send play time to updater to allow a more graceful ends to the RDS for a song
+		media_tracknum = str(j['track']) if 'track' in j else '0'
+		media_length = str(j['length']) if 'length' in j else '0'
 
-		# TODO: Info to much logging?
-		logging.info('Type is %s', media_type)
-		logging.info('Title is %s', media_title)
-		logging.info('Artist is %s', media_artist)
+		logging.debug('Type is %s', media_type)
+		logging.debug('Title is %s', media_title)
+		logging.debug('Artist is %s', media_artist)
+		logging.debug('Track # is %s', media_tracknum)
+		logging.debug('Length is %s', media_length)
 
-		if media_type == 'pause': # TODO: Other things to send blanks for?
+		if media_type == 'pause' or media_type == 'event':
 			fifo.write('T\n') # Blank Title
 			fifo.write('A\n') # Blank Artist
 		else:
 			fifo.write('T' + media_title + '\n')
 			fifo.write('A' + media_artist + '\n')
+		# TODO: Will tracknum and length never show up at the wrong time?
+		fifo.write('N' + media_tracknum + '\n')
+		fifo.write('L' + media_length + '\n')
 
-	elif argv[2] == 'playlist':
+	elif argv[1] == '--type' and argv[2] == 'playlist':
 		logging.info('Type playlist')
 		
 		# TODO: Exception handling for json?
@@ -103,6 +110,4 @@ with open(fifo_path, 'w') as fifo:
 			fifo.write('START\n')
 		else:
 			fifo.write('STOP\n')
-			fifo.write('T\n') # Blank Title
-			fifo.write('A\n') # Blank Artist
 	logging.debug('Processing done')

@@ -1,4 +1,5 @@
-#!/usr/bin/python2
+#!/usr/bin/python
+
 # v.1.1
 # Code reused from Adafruit's example code and Hansipete's original code
 # Converted into a reusable class by djazz (https://github.com/daniel-j/Adafruit-Si4713-RPi)
@@ -6,9 +7,11 @@
 # See the example at the end of this file for help!
 
 # Additional v1.1 changes by ShadowLight8 / Nick Anderson
+#  Removed example code at end of file
 #  Timing changes to get more consistent behavior from the Si4713
 #  Added Preemphasis variable to allow control from outside of the class
 #  Fixed a bug in setRDSBuffer
+#  Changed logic when Si4713 is missing, mostly to return false from begin
 
 from time import sleep
 import RPi.GPIO as GPIO
@@ -101,16 +104,18 @@ class Adafruit_Si4713(Adafruit_I2C):
 		self._rdsStation = None
 		self._rdsBuffer = None
 
-
 	def begin(self):
 
 		self.reset()
 
 		self.bus = Adafruit_I2C(self._addr, self._busnum, self._debug)
 
-		self.powerUp()
+		if not self.powerUp():
+			print 'Power Up issue'
+			return False
 
 		if self.getRev() is not 13:
+			print 'getRev issue'
 			return False
 
 		return True
@@ -202,9 +207,9 @@ class Adafruit_Si4713(Adafruit_I2C):
 			GPIO.cleanup(self._rst)
 
 	def powerUp(self):
-
 		#CHECK: Longer delay after power up of 500ms prior to first tune
-		self.sendCommand(self.SI4710_CMD_POWER_UP, [0x12, 0x50])
+		if self.sendCommand(self.SI4710_CMD_POWER_UP, [0x12, 0x50]) is -1:
+			return False
 		#sleep(0.5);
 
 		self.setProperty(self.SI4713_PROP_REFCLK_FREQ, 32768) # crystal is 32.768
@@ -218,10 +223,13 @@ class Adafruit_Si4713(Adafruit_I2C):
 		self.setProperty(self.SI4713_PROP_TX_RELEASE_TIME, 4) # 1000 ms
 		self.setProperty(self.SI4713_PROP_TX_ACOMP_GAIN, 5) # dB
 
+		return True
+
 	def getRev(self):
 		if self.sendCommand(self.SI4710_CMD_GET_REV, [0x00]) is -1:
-			self.restart()
-			return
+			#If sendCommand fails, stop
+			#self.restart()
+			return False
 
 		response = self.bus.readList(0x00, 9)
 		if response is -1:
