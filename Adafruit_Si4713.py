@@ -198,11 +198,11 @@ class Adafruit_Si4713(Adafruit_I2C):
 			# CHECK: Longer reset time?
 			# toggle pin
 			GPIO.output(self._rst, GPIO.HIGH)
-			sleep(0.1) # was 0.1
+			sleep(0.2) # was 0.1
 			GPIO.output(self._rst, GPIO.LOW)
-			sleep(0.1) # was 0.1
+			sleep(0.2) # was 0.1
 			GPIO.output(self._rst, GPIO.HIGH)
-			sleep(0.2) # give it some time to come back
+			sleep(0.5) # give it some time to come back
 
 			GPIO.cleanup(self._rst)
 
@@ -210,7 +210,7 @@ class Adafruit_Si4713(Adafruit_I2C):
 		#CHECK: Longer delay after power up of 500ms prior to first tune
 		if self.sendCommand(self.SI4710_CMD_POWER_UP, [0x12, 0x50]) is -1:
 			return False
-		#sleep(0.5);
+		sleep(0.5);
 
 		self.setProperty(self.SI4713_PROP_REFCLK_FREQ, 32768) # crystal is 32.768
 		self.setProperty(self.SI4713_PROP_TX_PREEMPHASIS, self.preemphasis) # 75uS pre-emph (default for US)

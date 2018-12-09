@@ -49,14 +49,41 @@ def cleanup():
 		pass
 
 def read_config():
+	#TODO: Deal with config missing or partial
 	global config
 	configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
-	config = {}
-	with open(configfile, 'r') as f:
-        	for line in f:
-                	(key, val) = line.split(' = ')
-	                config[key] = val.replace('"', '').strip()
-	logging.debug('Config %s', config)
+	config = {
+		'Start': 'FPPDStart',
+		'GPIONumReset': '4',
+		'Frequency': '100.10',
+		'Power': '95',
+		'Preemphasis': '75us',
+		'AntCap': '0',
+		'EnableRDS': 'False',
+		'StationDelay': '4',
+		'StationText': 'Happy   Hallo-     -ween',
+		'StationTitle': 'False',
+		'StationArtist': 'False',
+		'StationTrackNumPre': '',
+		'StationTrackNum': 'False',
+		'StationTrackNumSuf': 'of 4',
+		'RDSTextDelay': '7',
+		'RDSTextText': 'Happy   Hallo-     -ween',
+		'RDSTextTitle': 'False',
+		'RDSTextArtist': 'False',
+		'RDSTextTrackNumPre': '',
+		'RDSTextTrackNum': 'False',
+		'RDSTextTrackNumSuf': 'of 4'
+	}
+
+	try:
+		with open(configfile, 'r') as f:
+        		for line in f:
+                		(key, val) = line.split(' = ')
+	                	config[key] = val.replace('"', '').strip()
+	except IOError:
+		logging.info('No config file found, using defaults.')
+	logging.info('Config %s', config)
 
 def init_actions():
 	read_config()
