@@ -49,14 +49,13 @@ def cleanup():
 		pass
 
 def read_config():
-	#TODO: Deal with config missing or partial
 	global config
 	configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
 	config = {
 		'Start': 'FPPDStart',
 		'GPIONumReset': '4',
 		'Frequency': '100.10',
-		'Power': '95',
+		'Power': '110',
 		'Preemphasis': '75us',
 		'AntCap': '0',
 		'EnableRDS': 'False',
@@ -82,8 +81,8 @@ def read_config():
                 		(key, val) = line.split(' = ')
 	                	config[key] = val.replace('"', '').strip()
 	except IOError:
-		logging.info('No config file found, using defaults.')
-	logging.info('Config %s', config)
+		logging.warn('No config file found, using defaults.')
+	logging.debug('Config %s', config)
 
 def init_actions():
 	read_config()
@@ -106,7 +105,7 @@ def Si4713_start():
 		exit(1)
 
 	radio.setTXpower(int(config['Power']), int(config['AntCap']))
-	radio.tuneFM(int(config['Frequency'].replace('.','')))
+	radio.tuneFM(int(float(config['Frequency'])*100))
 
 	if config['EnableRDS'] == 'True':
 		radio.beginRDS()
@@ -121,8 +120,11 @@ def Si4713_status():
 	radio.readTuneStatus()
 	radio.readASQ()
 	logging.info('Radio status --- Power: %s dBuV - ANTcap: %s - Noise level: %s - Frequency: %s - ASQ: %s - Inlevel: %s dBfs', radio.currdBuV, radio.currAntCap, radio.currNoiseLevel, radio.currFreq, hex(radio.currASQ), radio.currInLevel)
-	# TODO: Watch for incorrect power or frequency, restart if needed
-
+	if radio.currFreq != int(float(config['Frequency'])*100):
+		logging.error('Radio frequency of %s does not match %s which is configured from %s', radio.currFreq, config['Frequency'], int(float(config['Frequency'])*100))
+	if radio.currdBuV != int(config['Power']):
+		logging.error('Radio power of %s does not match %s which is configured', radio.currdBuV, config['Power'])
+	
 def updateRDSData():
 	logging.info('Updating RDS Data')
 	logging.debug('Title %s', title)
