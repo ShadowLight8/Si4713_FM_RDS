@@ -18,13 +18,17 @@ In FPP, under Content Setup, open the Plugin Manager. Find "Si4713 FM and RDS" a
   - Pin 7 (GPIO4) -> RST
 - USB sound card and a short audio cable to go from the Pi to the Si4713
 
+### FPP v2.x Plugin Info
+Updated to follow the FPP v2.x plugin standards - https://github.com/FalconChristmas/fpp/commit/4d8dd95
+Additional discussion on forum thread - https://falconchristmas.com/forum/index.php/topic,10496.45.html
+
 ## Credits, Thanks, and Links
 ### Adafruit's Si4713 Breakout Board
 https://www.adafruit.com/product/1958
 
 ### Python class for Si4713
 Converted into a reusable class by djazz/daniel-j - https://github.com/daniel-j/Adafruit-Si4713-RPi
-Code reused from Adafruit's example code and Hansipete's original code. Original code is from this Adafruit forums thread: https://forums.adafruit.com/viewtopic.php?f=50&t=58453
+Code reused from Adafruit's example code and Hansipete's original code. Original code is from this Adafruit forums thread - https://forums.adafruit.com/viewtopic.php?f=50&t=58453
 
 ### Adafruit's I2C library
 https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/legacy/Adafruit_I2C/Adafruit_I2C.py
