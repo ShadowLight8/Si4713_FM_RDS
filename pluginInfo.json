@@ -1,0 +1,18 @@
+{
+	"repoName": "Si4713_FM_RDS",
+	"name": "Si4713 FM and RDS",
+	"author": "Nick Anderson (ShadowLight8)",
+	"description": "Using a Raspberry Pi 3 and Adafruit's Si4713 Breakout Board, this plugin will allow the Falcon Player (FPP) to control the Si4713, including sending RDS or Radio Text messages out on the broadcast. FPP reads the Title, Artist, Track Number, and Length from the media's metadata, which is sent to the plugin for sending out as RDS data.",
+	"homeURL": "https://github.com/ShadowLight8/Si4713_FM_RDS",
+	"srcURL": "https://github.com/ShadowLight8/Si4713_FM_RDS.git",
+	"bugURL": "https://github.com/ShadowLight8/Si4713_FM_RDS/issues",
+	"allowUpdates": 1,
+	"versions": [
+		{
+			"minFPPVersion": "2.0",
+			"maxFPPVersion": "0",
+			"branch": "master",
+			"sha": "",
+		}
+	]
+}
