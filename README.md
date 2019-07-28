@@ -1,12 +1,13 @@
 # Si4713_FM_RDS
 Si4713_FM_RDS Plugin for Falcon Player (FPP)
 
-Using a Raspberry Pi 3 and Adafruit's Si4713 Breakout Board, this plugin will allow the Falcon Player (FPP) to control the Si4713, including sending RDS or Radio Text messages out on the broadcast.
+Using a Raspberry Pi 3 and Adafruit's Si4713 FM transmitter breakout board with RDS or Radio Text support. This plugin allows the Falcon Player (FPP) to control the Si4713 FM transmitter, including sending RDS or Radio Text messages out on the broadcast.
 
-FPP reads the Title, Artist, Track Number, and Length from the media's metadata, which is sent to the plugin for sending out as RDS data.
+FPP reads the Title, Artist, Track Number, and Length from the media's metadata, which is sent out as RDS data.
 
 ## Instructions
-### TODO: Installation
+### Installation
+In FPP, under Content Setup, open the Plugin Manager. Find "Si4713 FM and RDS" and install. A restart of FPPD is needed.
 
 ### Initial setup - Hardware
 - Physical connection from Pi -> Si4713
@@ -16,8 +17,6 @@ FPP reads the Title, Artist, Track Number, and Length from the media's metadata,
   - Pin 6 (GND) -> GND
   - Pin 7 (GPIO4) -> RST
 - USB sound card and a short audio cable to go from the Pi to the Si4713
-
-### TODO: Initial setup - Software
 
 ## Credits, Thanks, and Links
 ### Adafruit's Si4713 Breakout Board
@@ -34,5 +33,3 @@ https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/legacy/Adafru
 Thanks to drlucase for fpp-edmrds - https://github.com/drlucas/fpp-edmrds
 
 Thanks for Materdaddy for fpp-vastfmt - https://github.com/Materdaddy/fpp-vastfmt
-
-
