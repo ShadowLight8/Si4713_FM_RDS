@@ -73,6 +73,7 @@ def read_config():
 		'RDSTextTrackNumPre': '',
 		'RDSTextTrackNum': 'False',
 		'RDSTextTrackNumSuf': 'of 4'
+		'Pty': '2'
 	}
 
 	try:
@@ -106,6 +107,7 @@ def Si4713_start():
 
 	radio.setTXpower(int(config['Power']), int(config['AntCap']))
 	radio.tuneFM(int(float(config['Frequency'])*100))
+	radio.pty = int(config['Pty'])
 
 	if config['EnableRDS'] == 'True':
 		radio.beginRDS()

@@ -145,6 +145,39 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <td style="border: 1px solid black; border-style: none solid"><?php PrintSettingSave("RDSTextTrackNumSuf", "RDSTextTrackNumSuf", 1, 0, "Si4713_FM_RDS"); ?></td>
 </tr>
 </table>
+<p>Program Type (PTY North America / Europe): <?php PrintSettingSelect("Pty", "Pty", 1, 0, 2, 
+Array(
+"0 - None / None"=>0, 
+"1 - News / News"=>1, 
+"2 - Information / Current Affairs"=>2, 
+"3 - Sport / Information"=>3, 
+"4 - Talk / Sport"=>4, 
+"5 - Rock / Education"=>5, 
+"6 - Classic Rock / Drama"=>6, 
+"7 - Adult Hits / Culture"=>7, 
+"8 - Soft Rock / Science"=>8, 
+"9 - Top 40 / Varied"=>9, 
+"10 - Country / Pop"=>10, 
+"11 - Oldies / Rock"=>11, 
+"12 - Soft Music / Easy Listening"=>12, 
+"13 - Nostalgia / Light Classical"=>13, 
+"14 - Jazz / Serious Classical"=>14, 
+"15 - Classical / Other Music"=>15, 
+"16 - R&B / Weather"=>16, 
+"17 - Soft R&B / Finance"=>17, 
+"18 - Language / Childrens"=>18, 
+"19 - Religious Music / Social Affairs"=>19, 
+"20 - Religious Talk / Religion"=>20, 
+"21 - Personality / Phone-In"=>21, 
+"22 - Public / Travel"=>22, 
+"23 - College / Leisure"=>23, 
+"24 - --- / Jazz"=>24, 
+"25 - --- / Country"=>25, 
+"26 - --- / National Music"=>26, 
+"27 - --- / Oldies"=>27, 
+"28 - --- / Folk"=>28, 
+"29 - Weather / Documentary"=>29), 
+"Si4713_FM_RDS", ""); ?> - <a href="https://www.electronics-notes.com/articles/audio-video/broadcast-audio/rds-radio-data-system-pty-codes.php">Additional PTY information</a></p>
 </fieldset>
 </div>
 

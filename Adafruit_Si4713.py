@@ -97,6 +97,7 @@ class Adafruit_Si4713(Adafruit_I2C):
 
 		# Additional properties
 		self.preemphasis = 0
+		self.pty = 2
 
 		# for restoring state
 		self._freq = None
@@ -326,7 +327,8 @@ class Adafruit_Si4713(Adafruit_I2C):
 		# 50% mix (default)
 		self.setProperty(self.SI4713_PROP_TX_RDS_PS_MIX, 0x03)
 		# RDSD0 & RDSMS (default)
-		self.setProperty(self.SI4713_PROP_TX_RDS_PS_MISC, 0x1848)
+		# Base value is 0x1848, & 0xFB1F to remove 5 bits for | self.pty
+		self.setProperty(self.SI4713_PROP_TX_RDS_PS_MISC, (0x1848 & 0xFB1F) | (self.pty << 5))
 		# 3 repeats (default)
 		self.setProperty(self.SI4713_PROP_TX_RDS_PS_REPEAT_COUNT, 3)
 
