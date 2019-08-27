@@ -72,7 +72,7 @@ def read_config():
 		'RDSTextArtist': 'False',
 		'RDSTextTrackNumPre': '',
 		'RDSTextTrackNum': 'False',
-		'RDSTextTrackNumSuf': 'of 4'
+		'RDSTextTrackNumSuf': 'of 4',
 		'Pty': '2'
 	}
 
