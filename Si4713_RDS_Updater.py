@@ -53,6 +53,7 @@ def read_config():
 	configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
 	config = {
 		'Start': 'FPPDStart',
+		'Stop': 'Never',
 		'GPIONumReset': '4',
 		'Frequency': '100.10',
 		'Power': '110',

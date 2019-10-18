@@ -98,7 +98,7 @@ with open(fifo_path, 'w') as fifo:
 
 	elif argv[1] == '--type' and argv[2] == 'playlist':
 		logging.info('Type playlist')
-		
+
 		# TODO: Exception handling for json?
 		j = json.loads(argv[4])
 
@@ -106,7 +106,7 @@ with open(fifo_path, 'w') as fifo:
 
 		logging.info('Playlist action %s', j['Action'])
 
-		if playlist_action == 'start':
+		if playlist_action == 'start' or playlist_action == 'playing':
 			fifo.write('START\n')
 		else:
 			fifo.write('STOP\n')
