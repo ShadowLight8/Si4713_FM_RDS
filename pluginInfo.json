@@ -2,7 +2,7 @@
 	"repoName": "Si4713_FM_RDS",
 	"name": "Si4713 FM and RDS",
 	"author": "Nick Anderson (ShadowLight8)",
-	"description": "Support for Adafruit's Si4713 FM transmitter breakout board with RDS / Radio Text support. Reads the Title, Artist, Track Number, and Length from the media's metadata, which is sent out as RDS data.",
+	"description": "Support for Adafruit's Si4713 FM transmitter breakout board with RDS / Radio Text support. Reads the Title, Artist, and Track Number from the media's metadata, which is sent out as RDS data.",
 	"homeURL": "https://github.com/ShadowLight8/Si4713_FM_RDS",
 	"srcURL": "https://github.com/ShadowLight8/Si4713_FM_RDS.git",
 	"bugURL": "https://github.com/ShadowLight8/Si4713_FM_RDS/issues",
