@@ -50,7 +50,6 @@ def cleanup():
 
 def read_config():
 	global config
-	configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
 	config = {
 		'Start': 'FPPDStart',
 		'Stop': 'Never',
@@ -74,9 +73,11 @@ def read_config():
 		'RDSTextTrackNumPre': '',
 		'RDSTextTrackNum': 'False',
 		'RDSTextTrackNumSuf': 'of 4',
-		'Pty': '2'
+		'Pty': '2',
+		'LoggingLevel': 'INFO'
 	}
 
+	configfile = os.getenv('CFGDIR', '/home/fpp/media/config') + '/plugin.Si4713_FM_RDS'
 	try:
 		with open(configfile, 'r') as f:
         		for line in f:
@@ -84,6 +85,7 @@ def read_config():
 	                	config[key] = val.replace('"', '').strip()
 	except IOError:
 		logging.warn('No config file found, using defaults.')
+	logging.getLogger().setLevel(config['LoggingLevel'])
 	logging.debug('Config %s', config)
 
 def init_actions():
@@ -185,7 +187,7 @@ config = {}
 # Setup logging
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.INFO, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info("----------")
 
 init_actions()

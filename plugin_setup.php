@@ -186,6 +186,13 @@ Array(
 <div id="Si4713Debug" class="settings">
 <fieldset>
 <legend>Si4713 Debugging</legend>
+<p>Logging Level for Si4713_updater.log: <?php PrintSettingSelect("LoggingLevel", "LoggingLevel", 1, 0, "INFO",
+Array(
+"DEBUG"=>"DEBUG",
+"INFO"=>"INFO",
+"WARNING"=>"WARNING",
+"ERROR"=>"ERROR",
+"CRITICAL"=>"CRITICAL"), "Si4713_FM_RDS", ""); ?></p>
 <p>Si4713_callbacks.log: <input onclick= "ViewFile('Logs', '../plugins/Si4713_FM_RDS/Si4713_callbacks.log');" id="btnViewScript" class="buttons" type="button" value="View" /></p>
 <p>Si4713_updater.log: <input onclick= "ViewFile('Logs', '../plugins/Si4713_FM_RDS/Si4713_updater.log');" id="btnViewScript" class="buttons" type="button" value="View" /></p>
 </fieldset>
