@@ -61,10 +61,10 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <fieldset>
 <legend>Si4713 FM Settings</legend>
 <p>Frequency (76.00-108.00): <?php PrintSettingText("Frequency", 1, 0, 6, 6, "Si4713_FM_RDS", "100.10"); ?>MHz <?php PrintSettingSave("Frequency", "Frequency", 1, 0, "Si4713_FM_RDS"); ?></p>
-<p>Power (88-115, 116-120<sup>*</sup>): <?php PrintSettingText("Power", 1, 0, 3, 3, "Si4713_FM_RDS", "110"); ?>dB&mu;V <?php PrintSettingSave("Power", "Power", 1, 0, "Si4713_FM_RDS"); ?>
+<p>Power (88-115, 116-120<sup>*</sup>): <?php PrintSettingText("Power", 1, 0, 3, 3, "Si4713_FM_RDS", "113"); ?>dB&mu;V <?php PrintSettingSave("Power", "Power", 1, 0, "Si4713_FM_RDS"); ?>
 <br /><sup>*</sup>Can be set as high as 120dB&mu;V, but voltage accuracy above 115dB&mu;V is not guaranteed.</p>
 <p>Preemphasis: <?php PrintSettingSelect("Preemphasis", "Preemphasis", 1, 0, "75us", Array("50&mu;s (Europe, Australia, Japan)"=>"50us", "75&mu;s (USA, default)"=>"75us"), "Si4713_FM_RDS", ""); ?></p>
-<p>Antenna Tuning Capacitor (0=Auto, 1-191): <?php PrintSettingText("AntCap", 1, 0, 3, 3, "Si4713_FM_RDS", "0"); ?> * 0.25pF <?php PrintSettingSave("AntCap", "AntCap", 1, 0, "Si4713_FM_RDS"); ?></p>
+<p>Antenna Tuning Capacitor (0=Auto, 1-191): <?php PrintSettingText("AntCap", 1, 0, 3, 3, "Si4713_FM_RDS", "32"); ?> * 0.25pF <?php PrintSettingSave("AntCap", "AntCap", 1, 0, "Si4713_FM_RDS"); ?></p>
 </fieldset>
 </div>
 
@@ -73,7 +73,7 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <div id="Si4713RDSsettings" class="settings">
 <fieldset>
 <legend>Si4713 RDS Settings</legend>
-<p>Enable RDS: <?php PrintSettingCheckbox("EnableRDS", "EnableRDS", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></p>
+<p>Enable RDS: <?php PrintSettingCheckbox("EnableRDS", "EnableRDS", 1, 0, "True", "False", "Si4713_FM_RDS", "", "True"); ?></p>
 <p>RDS Station - Sent 8 characters at a time</p>
 <p>Delay between 8 character blocks (&gt;=3): <?php PrintSettingText("StationDelay", 1, 0, 3, 3, "Si4713_FM_RDS", "4"); ?>seconds <?php PrintSettingSave("StationDelay", "StationDelay", 1, 0, "Si4713_FM_RDS"); ?></p>
 <table style="border: 1px solid black; border-collapse: collapse; text-align: center">
@@ -85,8 +85,8 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 </tr>
 <tr>
 <td style="border: 1px solid black; border-style: none solid"><?php PrintSettingText("StationText", 1, 0, 64, 32, "Si4713_FM_RDS", "Happy   Hallo-     -ween"); ?></td>
-<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></td>
-<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("StationArtist", "StationArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></td>
+<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("StationTitle", "StationTitle", 1, 0, "True", "False", "Si4713_FM_RDS", "", "True"); ?></td>
+<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("StationArtist", "StationArtist", 1, 0, "True", "False", "Si4713_FM_RDS", "", "True"); ?></td>
 <td style="border: 1px solid black; border-style: none solid">Prefix</td>
 <td style="border: 1px solid black; border-style: none solid">Show</td>
 <td style="border: 1px solid black; border-style: none solid">Suffix</td>
@@ -96,7 +96,7 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <td style="border: 1px solid black; border-style: none solid"></td>
 <td style="border: 1px solid black; border-style: none solid"></td>
 <td style="border: 1px solid black; border-style: none solid"><?php PrintSettingText("StationTrackNumPre", 1, 0, 64, 8, "Si4713_FM_RDS", ""); ?></td>
-<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("StationTrackNum", "StationTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></td>
+<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("StationTrackNum", "StationTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", "", "True"); ?></td>
 <td style="border: 1px solid black; border-style: none solid"><?php PrintSettingText("StationTrackNumSuf", 1, 0, 64, 8, "Si4713_FM_RDS", "of 4"); ?></td>
 </tr>
 <tr>
@@ -122,8 +122,8 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 </tr>
 <tr>
 <td style="border: 1px solid black; border-style: none solid"><?php PrintSettingText("RDSTextText", 1, 0, 64, 32, "Si4713_FM_RDS", "Happy   Hallo-     -ween"); ?></td>
-<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("RDSTextTitle", "RDSTextTitle", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></td>
-<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("RDSTextArtist", "RDSTextArtist", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></td>
+<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("RDSTextTitle", "RDSTextTitle", 1, 0, "True", "False", "Si4713_FM_RDS", "", "True"); ?></td>
+<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("RDSTextArtist", "RDSTextArtist", 1, 0, "True", "False", "Si4713_FM_RDS", "", "True"); ?></td>
 <td style="border: 1px solid black; border-style: none solid">Prefix</td>
 <td style="border: 1px solid black; border-style: none solid">Show</td>
 <td style="border: 1px solid black; border-style: none solid">Suffix</td>
@@ -132,8 +132,8 @@ At Stop, the Si4713 is reset. Listeners will hear static.</p>
 <td style="border: 1px solid black; border-style: none solid"><?php PrintSettingSave("RDSTextText", "RDSTextText", 1, 0, "Si4713_FM_RDS"); ?></td>
 <td style="border: 1px solid black; border-style: none solid"></td>
 <td style="border: 1px solid black; border-style: none solid"></td>
-<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingText("RDSTextTrackNumPre", 1, 0, 64, 8, "Si4713_FM_RDS", ""); ?></td>
-<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("RDSTextTrackNum", "RDSTextTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", ""); ?></td>
+<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingText("RDSTextTrackNumPre", 1, 0, 64, 8, "Si4713_FM_RDS", "Track "); ?></td>
+<td style="border: 1px solid black; border-style: none solid"><?php PrintSettingCheckbox("RDSTextTrackNum", "RDSTextTrackNum", 1, 0, "True", "False", "Si4713_FM_RDS", "", "True"); ?></td>
 <td style="border: 1px solid black; border-style: none solid"><?php PrintSettingText("RDSTextTrackNumSuf", 1, 0, 64, 8, "Si4713_FM_RDS", "of 4"); ?></td>
 </tr>
 <tr>
