@@ -241,7 +241,7 @@ with open(fifo_path, 'r', 0) as fifo:
 
 			elif line == 'START':
 				logging.info('Processing start')
-				if config['Start'] == "Playlist":
+				if config['Start'] == "PlaylistStart":
 					Si4713_start()
 
 			elif line == 'STOP':
@@ -251,7 +251,7 @@ with open(fifo_path, 'r', 0) as fifo:
 				tracknum = ''
 				updateRDSData()
 
-				if config['Stop'] == "Playlist":
+				if config['Stop'] == "PlaylistStop":
 					radio.reset()
 					radio = None
 					radio_ready = False
