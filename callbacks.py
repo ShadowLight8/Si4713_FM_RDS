@@ -108,6 +108,6 @@ with open(fifo_path, 'w') as fifo:
 
 		if playlist_action == 'start': # or playlist_action == 'playing':
 			fifo.write('START\n')
-		else:
+		elif playlist_action == 'stop':
 			fifo.write('STOP\n')
 	logging.debug('Processing done')
