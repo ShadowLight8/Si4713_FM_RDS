@@ -13,6 +13,8 @@
 #  Fixed a bug in setRDSBuffer
 #  Changed logic when Si4713 is missing, mostly to return false from begin
 
+# 20221103 - Updated to python3
+
 from time import sleep
 import RPi.GPIO as GPIO
 from Adafruit_I2C import Adafruit_I2C
@@ -112,11 +114,11 @@ class Adafruit_Si4713(Adafruit_I2C):
 		self.bus = Adafruit_I2C(self._addr, self._busnum, self._debug)
 
 		if not self.powerUp():
-			print 'Power Up issue'
+			print ('Power Up issue')
 			return False
 
 		if self.getRev() is not 13:
-			print 'getRev issue'
+			print ('getRev issue')
 			return False
 
 		return True
@@ -186,7 +188,7 @@ class Adafruit_Si4713(Adafruit_I2C):
 		if timeout > 0:
 			return True
 		else:
-			print "waitForByte TIMEOUT"
+			print ("waitForByte TIMEOUT")
 			return False
 
 	def reset(self):
@@ -344,7 +346,7 @@ class Adafruit_Si4713(Adafruit_I2C):
 		stationName = [' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ']
 
 		# calc number of slots needed
-		slots = (len(s)+3) / 4
+		slots = (len(s)+3) // 4
 
 		i = 0
 		for char in s:
@@ -363,7 +365,7 @@ class Adafruit_Si4713(Adafruit_I2C):
 		bufferArray = [' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ', ' ',' ',' ',' ']
 
 		# calc number of slots needed
-		slots = (len(s)+3) / 4
+		slots = (len(s)+3) // 4
 
 		i = 0
 		for char in s:

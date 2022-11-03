@@ -10,13 +10,13 @@ from sys import argv
 from time import sleep
 
 if len(argv) <= 1:
-	print 'Usage:'
-	print '   --list     | Used by fppd at startup. Used to start up the Si4713_RDS_Updater.py script'
-	print '   --reset    | Function by plugin_setup.php to reset the GPIO pin connected to the Si4713'
-	print '   --exit     | Function used to shutdown the Si4713_RDS_Updater.py script'
-	print '   --type media --data \'{...}\'    | Used by fppd when a new items starts in a playlist'
-	print '   --type playlist --data \'{...}\' | Used by fppd when a playlist starts or stops'
-	print 'Note: Running with sudo might be needed for manual execution'
+	print('Usage:')
+	print('   --list     | Used by fppd at startup. Used to start up the Si4713_RDS_Updater.py script')
+	print('   --reset    | Function by plugin_setup.php to reset the GPIO pin connected to the Si4713')
+	print('   --exit     | Function used to shutdown the Si4713_RDS_Updater.py script')
+	print('   --type media --data \'{...}\'    | Used by fppd when a new items starts in a playlist')
+	print( '   --type playlist --data \'{...}\' | Used by fppd when a playlist starts or stops')
+	print('Note: Running with sudo might be needed for manual execution')
 	exit()
 
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
@@ -57,7 +57,7 @@ with open(fifo_path, 'w') as fifo:
 	logging.info('Processing %s', argv[1])
 	if argv[1] == '--list':
 		fifo.write('INIT\n')
-		print 'media,playlist'
+		print('media,playlist')
 
 	elif argv[1] == '--reset':
 		# Not used by FPPD, but used by plugin_setup.php

@@ -213,7 +213,7 @@ except OSError as oe:
 		logging.debug('Fifo already exists')
 
 # Main loop
-with open(fifo_path, 'r', 0) as fifo:
+with open(fifo_path, 'r') as fifo:
 	while True:
 		line = fifo.readline().rstrip()
 		if len(line) > 0:
