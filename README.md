@@ -20,7 +20,10 @@ Can be manually added by using https://raw.githubusercontent.com/ShadowLight8/Si
 - USB sound card and a short audio cable to go from the Pi to the Si4713
 
 ### FPP Plugin Info
-Most recently tested on v3.6.1-7-gd1d56049 as of 2/22/2020
+Most recently tested on v6.1.1 as of 2022/11/03
+Updated to use Python 3 as the standard version in FPP 6.0 and above
+Prior Python 2 version can be found as release https://github.com/ShadowLight8/Si4713_FM_RDS/releases/tag/Pre-FPP-6.0
+
 Updated for the FPP v3.x plugin standards
 Originally built to follow the FPP v2.x plugin standards - https://github.com/FalconChristmas/fpp/commit/4d8dd95
 Additional discussion on forum thread - https://falconchristmas.com/forum/index.php/topic,10496.45.html
