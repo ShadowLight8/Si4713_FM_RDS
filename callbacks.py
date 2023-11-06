@@ -6,6 +6,7 @@ import os
 import errno
 import subprocess
 import socket
+import sys
 from sys import argv
 from time import sleep
 
@@ -24,6 +25,12 @@ script_dir = os.path.dirname(os.path.abspath(argv[0]))
 logging.basicConfig(filename=script_dir + '/Si4713_callbacks.log', level=logging.INFO, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 logging.info('----------')
 logging.debug('Arguments %s', argv[1:])
+
+try:
+	import smbus
+except ImportError as impErr:
+	logging.error("Failed to import {}.".format(impErr.args[0]))
+	sys.exit(1)
 
 # Environ has a few useful items when FPPD runs callbacks.py, but logging it all the time, even at debug, is too much
 #logging.debug('Environ %s', os.environ)

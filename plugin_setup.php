@@ -1,7 +1,13 @@
-<?php $outputGPIOReset = "";
+<?
+$outputGPIOReset = "";
 if (isset($_POST["GPIOResetButton"]))
 {
 $outputGPIOReset = shell_exec(escapeshellcmd("sudo ".$pluginDirectory."/".$_GET['plugin']."/callbacks.py --reset"));
+}
+$outputReinstallScript;
+if (isset($_POST["ReinstallScript"]))
+{
+$outputReinstallScript = shell_exec(escapeshellcmd("sudo ".$pluginDirectory."/".$_GET['plugin']."/scripts/fpp_install.sh"));
 }
 ?>
 
@@ -21,23 +27,24 @@ $outputGPIOReset = shell_exec(escapeshellcmd("sudo ".$pluginDirectory."/".$_GET[
 <fieldset>
 <legend>Si4713 Detection</legend>
 
-<div style="float: right; clear: right;">
-<span style="float: right;"><a href="#" onclick="toggle('RPi_Pinout')">Click for Raspberry Pi GPIO#'s</a></span>
-<a title="By Tux-Man (Own work) [CC0], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File%3ARaspberry_Pi_Mle_B_-_GPIO.png">
-<img id="RPi_Pinout" style="display: none" width="333" alt="Raspberry Pi Mle B - GPIO" src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Raspberry_Pi_Mle_B_-_GPIO.png"/>
-</a>
-</div>
+<?
+if (empty(trim(shell_exec("dpkg -s python3-smbus | grep installed")))) {
+  echo "<div class='callout callout-danger'><form method='post'>python3-smbus is missing and needs to be reinstalled. <button name='ReinstallScript'>Try re-running install script</button> It may take up to 1 minute to return.</form>";
+  echo "<br />This is common after an FPP OS Upgrade.";
+  echo "<br />Other options are to Uninstall and reinstall <b>Si4713 FM and RDS</b> from Plugin Manager or run <tt>sudo apt-get install -y python3-smbus</tt> and restart FPP";
+  echo $outputGPIOReset;
+  echo "</div>";
 
-<?php exec("sudo i2cget -y 1 0x63 2>&1", $output, $return_val); ?>
-<p>Detecting Si4713:
-<?php if (implode($output) != "Error: Read failed") : ?>
-<span class='good'>Detected on I<sup>2</sup>C address 0x63</span>
-<?php else: ?>
-<span class='bad'>Not detected on I<sup>2</sup>C addresses 0x63</span> <!-- TODO: Check on 0x11 as well -->
-<br />
-The Si4713 must be reset after power on to be detected. Set the GPIO# for the reset pin, save, use the GPIO Reset, and restart FPP.
-<?php endif; ?>
-</p>
+} 
+
+exec("sudo i2cget -y 1 0x63 2>&1", $output, $return_val);
+if (implode($output) != "Error: Read failed") {
+  echo '<div class="callout callout-success">Detected Si4713 on I<sup>2</sup>C address 0x63</div>';
+} else {
+  echo '<div class="callout callout-danger">Si4713 not detected on I<sup>2</sup>C addresses 0x63';
+  echo '<br />The Si4713 must be reset after power on to be detected. Set the GPIO# for the reset pin, save, use the GPIO Reset, and restart FPP.</div>';
+}
+?>
 <p>GPIO# (not pin number) for Reset: <?php PrintSettingText("GPIONumReset", 1, 0, 2, 2, "Si4713_FM_RDS", "4"); ?><?php PrintSettingSave("GPIONumReset", "GPIONumReset", 1, 0, "Si4713_FM_RDS"); ?></p>
 <form method="post"><p><button name="GPIOResetButton">Execute GPIO Reset</button> <?php echo $outputGPIOReset; ?></p></form>
 </fieldset>
@@ -185,7 +192,7 @@ Array(
 
 <div id="Si4713Debug" class="settings">
 <fieldset>
-<legend>Si4713 Debugging</legend>
+<legend>Si4713 Logs</legend>
 <p>Logging Level for Si4713_updater.log: <?php PrintSettingSelect("LoggingLevel", "LoggingLevel", 1, 0, "INFO",
 Array(
 "DEBUG"=>"DEBUG",
@@ -193,8 +200,10 @@ Array(
 "WARNING"=>"WARNING",
 "ERROR"=>"ERROR",
 "CRITICAL"=>"CRITICAL"), "Si4713_FM_RDS", ""); ?></p>
-<p>Si4713_callbacks.log: <input onclick= "ViewFile('Logs', '../plugins/Si4713_FM_RDS/Si4713_callbacks.log');" id="btnViewScript" class="buttons" type="button" value="View" /></p>
-<p>Si4713_updater.log: <input onclick= "ViewFile('Logs', '../plugins/Si4713_FM_RDS/Si4713_updater.log');" id="btnViewScript" class="buttons" type="button" value="View" /></p>
+<p>Si4713_callbacks.log: <input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_callbacks.log', 'Si4713_FM_RDS/Si4713_callbacks.log');" id="btnViewScript" class="buttons" type="button" value="View All" />
+<input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_callbacks.log?tail=100', 'Si4713_FM_RDS/Si4713_callbacks.log');" id="btnViewScript" class="buttons" type="button" value="View Last 100" /></p>
+<p>Si4713_updater.log: <input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_updater.log', 'Si4713_FM_RDS/Si4713_updater.log');" id="btnViewScript" class="buttons" type="button" value="View All" />
+<input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_updater.log?tail=100', 'Si4713_FM_RDS/Si4713_updater.log');" id="btnViewScript" class="buttons" type="button" value="View Last 100" /></p>
 </fieldset>
 </div>
 
@@ -216,8 +225,9 @@ Pin 6 (GND) -&gt; GND<br />
 Pin 7 (GPIO4) -&gt; RST<br />
 USB sound card and a short audio cable to go from the Pi to the Si4713</p>
 <p><a href="https://www.adafruit.com/product/1958">Adafruit Si4713 Breakout Board</a></p>
-<p><a href="https://www.silabs.com/documents/public/data-sheets/Si4712-13-B30.pdf">Si4713 Datasheet</a></p>
-<p><a href="https://www.silabs.com/documents/public/application-notes/AN332.pdf">Si4713 Programming Guide</a></p>
-<p><a href="https://www.silabs.com/documents/public/user-guides/Si47xxEVB.pdf">Si4713 Evaluation Board Guide</a></p>
+<p><a href="https://www.skyworksinc.com/-/media/Skyworks/SL/documents/public/data-sheets/Si4712-13-B30.pdf">Si4713 Datasheet</a></p>
+<p><a href="https://www.skyworksinc.com/-/media/Skyworks/SL/documents/public/application-notes/AN332.pdf">Si4713 Programming Guide</a></p>
+<p><a href="https://www.skyworksinc.com/-/media/Skyworks/SL/documents/public/user-guides/Si47xxEVB.pdf">Si4713 Evaluation Board Guide</a></p>
+<p><a href="https://www.skyworksinc.com/-/media/SkyWorks/SL/documents/public/application-notes/AN383.pdf">Si4713 Design Guidelines</a></p>
 </fieldset>
 <!-- last div intentionally skipped to fix footer background -->
