@@ -6,7 +6,6 @@
 	"homeURL": "https://github.com/ShadowLight8/Si4713_FM_RDS",
 	"srcURL": "https://github.com/ShadowLight8/Si4713_FM_RDS.git",
 	"bugURL": "https://github.com/ShadowLight8/Si4713_FM_RDS/issues",
-	"allowUpdates": 1,
 	"versions": [
 		{
 			"minFPPVersion": "6.0",
