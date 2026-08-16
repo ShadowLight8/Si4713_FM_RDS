@@ -187,7 +187,8 @@ config = {}
 # Setup logging
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
 
-logging.basicConfig(filename=script_dir + '/Si4713_updater.log', level=logging.DEBUG, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+log_dir = os.getenv('LOGDIR', '/home/fpp/media/logs')
+logging.basicConfig(filename=log_dir + '/plugin-Si4713_FM_RDS.log', level=logging.DEBUG, format='%(asctime)s:U:%(name)s:%(levelname)s:%(message)s')
 logging.info("----------")
 
 init_actions()

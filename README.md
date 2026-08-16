@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **This plugin is retiring after FPP 10. Please switch to [Dynamic_RDS](https://github.com/ShadowLight8/Dynamic_RDS).**
+> Dynamic_RDS supports the same Si4713 hardware with no wiring changes, plus fully customizable
+> RDS text, MQTT, and ongoing FPP support. This repo is receiving its final round of updates.
+
 # Si4713_FM_RDS
 Si4713_FM_RDS Plugin for Falcon Player (FPP)
 
