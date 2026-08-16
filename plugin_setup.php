@@ -1,13 +1,18 @@
-<?
+<?php
+echo "<div class='callout callout-warning'><b>This plugin is retiring after FPP 10.</b><br />";
+echo "Please switch to <span style='font-size:1.2em; font-weight:bold'>Dynamic RDS</span> in the <a href='plugins.php'>Plugin Manager</a>,<br />";
+echo "which supports this same Si4713 board with no hardware changes and is actively maintained.</div>";
+
 $outputGPIOReset = "";
+$pluginPath = $pluginDirectory."/Si4713_FM_RDS";
 if (isset($_POST["GPIOResetButton"]))
 {
-$outputGPIOReset = shell_exec(escapeshellcmd("sudo ".$pluginDirectory."/".$_GET['plugin']."/callbacks.py --reset"));
+$outputGPIOReset = shell_exec("sudo ".escapeshellarg($pluginPath."/callbacks.py")." --reset");
 }
 $outputReinstallScript;
 if (isset($_POST["ReinstallScript"]))
 {
-$outputReinstallScript = shell_exec(escapeshellcmd("sudo ".$pluginDirectory."/".$_GET['plugin']."/scripts/fpp_install.sh"));
+$outputReinstallScript = shell_exec("sudo ".escapeshellarg($pluginPath."/scripts/fpp_install.sh"));
 }
 ?>
 
@@ -200,10 +205,8 @@ Array(
 "WARNING"=>"WARNING",
 "ERROR"=>"ERROR",
 "CRITICAL"=>"CRITICAL"), "Si4713_FM_RDS", ""); ?></p>
-<p>Si4713_callbacks.log: <input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_callbacks.log', 'Si4713_FM_RDS/Si4713_callbacks.log');" id="btnViewScript" class="buttons" type="button" value="View All" />
-<input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_callbacks.log?tail=100', 'Si4713_FM_RDS/Si4713_callbacks.log');" id="btnViewScript" class="buttons" type="button" value="View Last 100" /></p>
-<p>Si4713_updater.log: <input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_updater.log', 'Si4713_FM_RDS/Si4713_updater.log');" id="btnViewScript" class="buttons" type="button" value="View All" />
-<input onclick= "ViewFileImpl('api/file/plugins/Si4713_FM_RDS/Si4713_updater.log?tail=100', 'Si4713_FM_RDS/Si4713_updater.log');" id="btnViewScript" class="buttons" type="button" value="View Last 100" /></p>
+<p>plugin-Si4713_FM_RDS.log: <input onclick= "ViewFileImpl('api/file/logs/plugin-Si4713_FM_RDS.log', 'Si4713_FM_RDS.log');" id="btnViewScript" class="buttons" type="button" value="View All" />
+<input onclick= "ViewFileImpl('api/file/logs/plugin-Si4713_FM_RDS.log?tail=100', 'Si4713_FM_RDS.log');" id="btnViewScript" class="buttons" type="button" value="View Last 100" /></p>
 </fieldset>
 </div>
 

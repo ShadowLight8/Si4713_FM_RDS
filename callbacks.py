@@ -21,8 +21,8 @@ if len(argv) <= 1:
 	exit()
 
 script_dir = os.path.dirname(os.path.abspath(argv[0]))
-
-logging.basicConfig(filename=script_dir + '/Si4713_callbacks.log', level=logging.INFO, format='%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+log_dir = os.getenv('LOGDIR', '/home/fpp/media/logs')
+logging.basicConfig(filename=log_dir + '/plugin-Si4713_FM_RDS.log', level=logging.INFO, format='%(asctime)s:C:%(name)s:%(levelname)s:%(message)s')
 logging.info('----------')
 logging.debug('Arguments %s', argv[1:])
 

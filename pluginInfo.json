@@ -1,11 +1,12 @@
 {
 	"repoName": "Si4713_FM_RDS",
-	"name": "Si4713 FM and RDS",
+	"name": "Si4713 FM and RDS (Retiring)",
 	"author": "Nick Anderson (ShadowLight8)",
-	"description": "Support for Adafruit's Si4713 FM transmitter breakout board with RDS / Radio Text support. Reads the Title, Artist, and Track Number from the media's metadata, which is sent out as RDS data.",
+	"description": "This plugin is retiring after FPP 10 - switch to the **Dynamic_RDS** plugin, which supports the Si4713 board. Support for Adafruit's Si4713 FM transmitter breakout board with RDS / Radio Text support.",
 	"homeURL": "https://github.com/ShadowLight8/Si4713_FM_RDS",
 	"srcURL": "https://github.com/ShadowLight8/Si4713_FM_RDS.git",
 	"bugURL": "https://github.com/ShadowLight8/Si4713_FM_RDS/issues",
+	"iconURL": "https://raw.githubusercontent.com/ShadowLight8/Si4713_FM_RDS/master/icon.png",
 	"versions": [
 		{
 			"minFPPVersion": "6.0",
@@ -16,6 +17,13 @@
 		},
 		{
 			"minFPPVersion": "9.0",
+			"maxFPPVersion": "9.99",
+			"branch": "master",
+			"sha": "",
+			"allowUpdates": 1
+		},
+		{
+			"minFPPVersion": "10.0",
 			"maxFPPVersion": "0",
 			"branch": "master",
 			"sha": "",
