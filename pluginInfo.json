@@ -7,6 +7,32 @@
 	"srcURL": "https://github.com/ShadowLight8/Si4713_FM_RDS.git",
 	"bugURL": "https://github.com/ShadowLight8/Si4713_FM_RDS/issues",
 	"iconURL": "https://raw.githubusercontent.com/ShadowLight8/Si4713_FM_RDS/master/icon.png",
+	"privacy": {
+		"summary": "Broadcasts the song title, artist, track number and other text you set to FM radios nearby. Nothing is sent over the network.",
+		"sends": [
+			{
+				"to": "anyone in FM range",
+				"what": "the song title, artist, track number and other text you set",
+				"why": "to show what's playing on listeners' radios",
+				"alwaysOn": false
+			}
+		],
+		"collects": [],
+		"sensors": [],
+		"remoteAccess": "none",
+		"systemChanges": [
+			{
+				"kind": "download",
+				"what": "installs the python3-smbus package from Debian during install, or when you click to reinstall it on the settings page"
+			},
+			{
+				"kind": "core-settings",
+				"what": "asks FPP to restart after install"
+			}
+		],
+		"closedCode": false,
+		"other": "Settings pages on FPP's web server can reset the transmitter's GPIO pin and reinstall a package as root; they have the same protection as FPP's own pages."
+	},
 	"versions": [
 		{
 			"minFPPVersion": "6.0",
